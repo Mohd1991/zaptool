@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Counter Tool | Free Online Text Analysis Utility</title>
+    <meta name="description" content="Free online character counter tool that instantly counts characters, words, and sentences. Perfect for social media, SEO content, and writing projects.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #2ec4b6;
+            --warning: #ff9f1c;
+            --danger: #e71d36;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #555;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        @media (min-width: 992px) {
+            .main-content {
+                grid-template-columns: 1.5fr 1fr;
+            }
+        }
+        
+        .counter-section {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            transition: var(--transition);
+        }
+        
+        .counter-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .input-container {
+            margin-bottom: 25px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 250px;
+            padding: 20px;
+            font-size: 1.1rem;
+            border: 2px solid #e1e5eb;
+            border-radius: var(--border-radius);
+            resize: vertical;
+            transition: var(--transition);
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(76, 201, 240, 0.2);
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-box {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid #dee2e6;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-3px);
+        }
+        
+        .btn-reset {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background: #c1121f;
+            transform: translateY(-3px);
+        }
+        
+        .seo-content {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+        }
+        
+        .seo-content h2 {
+            color: var(--secondary);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .content-section {
+            margin-bottom: 30px;
+        }
+        
+        .content-section h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+        }
+        
+        .benefits-list {
+            padding-left: 25px;
+            margin: 15px 0;
+        }
+        
+        .benefits-list li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .faq-item {
+            margin-bottom: 20px;
+            border: 1px solid #eaeaea;
+            border-radius: var(--border-radius);
+            padding: 15px;
+        }
+        
+        .faq-item h4 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, rgba(76, 201, 240, 0.3), rgba(76, 201, 240, 0));
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Character Counter Tool</h1>
+            <p class="subtitle">Free online utility to count characters, words, and sentences in your text. Perfect for social media, SEO content, academic writing, and more.</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="counter-section">
+                <div class="input-container">
+                    <textarea id="text-input" placeholder="Type or paste your text here...">Character counters are essential tools for writers, marketers, and social media managers. They help ensure your content fits within platform limits and meets specific requirements. This tool provides real-time statistics as you type!</textarea>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <h3>Characters</h3>
+                        <div class="stat-value" id="char-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Words</h3>
+                        <div class="stat-value" id="word-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Sentences</h3>
+                        <div class="stat-value" id="sentence-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Paragraphs</h3>
+                        <div class="stat-value" id="paragraph-count">0</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-labels">
+                        <span>0%</span>
+                        <span id="progress-text">Character Usage</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn-primary" onclick="copyText()">Copy Text</button>
+                    <button class="btn-secondary" onclick="clearText()">Clear Text</button>
+                    <button class="btn-reset" onclick="resetCounter()">Reset All</button>
+                </div>
+            </div>
+            
+            <div class="seo-content">
+                <h2>Why Use a Character Counter?</h2>
+                
+                <div class="content-section">
+                    <h3>The Importance of Character Counting</h3>
+                    <p>Character counting is crucial in many contexts. Social media platforms like Twitter impose strict character limits (280 characters). Meta descriptions for SEO should be under 160 characters. SMS messages have 160-character limits. Academic papers often have strict word count requirements.</p>
+                    <p>This tool helps you stay within these limits while optimizing your content for maximum impact.</p>
+                </div>
+                
+                <div class="content-section">
+                    <h3>Benefits of Using Our Character Counter</h3>
+                    <ul class="benefits-list">
+                        <li><span class="highlight">Real-time analysis</span> - See counts update as you type</li>
+                        <li><span class="highlight">Multi-metric tracking</span> - Characters, words, sentences, paragraphs</li>
+                        <li><span class="highlight">Visual progress indicator</span> - Track your usage against limits</li>
+                        <li><span class="highlight">Responsive design</span> - Works on all devices: desktop, tablet, and mobile</li>
+                        <li><span class="highlight">Completely free</span> - No signup required, no hidden fees</li>
+                        <li><span class="highlight">Privacy focused</span> - Your text never leaves your browser</li>
+                    </ul>
+                </div>
+                
+                <div class="content-section">
+                    <h3>Platform Character Limits</h3>
+                    <p>Different platforms have different requirements:</p>
+                    <ul class="benefits-list">
+                        <li><strong>Twitter:</strong> 280 characters</li>
+                        <li><strong>Facebook:</strong> 63,206 characters (posts), 250 characters (comments)</li>
+                        <li><strong>Instagram:</strong> 2,200 characters (captions)</li>
+                        <li><strong>LinkedIn:</strong> 3,000 characters (posts)</li>
+                        <li><strong>SEO Meta Description:</strong> 150-160 characters recommended</li>
+                    </ul>
+                </div>
+                
+                <div class="content-section">
+                    <h3>Frequently Asked Questions</h3>
+                    <div class="faq-item">
+                        <h4>Does this tool store my text?</h4>
+                        <p>No, all processing happens in your browser. Your text is never sent to any server.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>What counts as a word?</h4>
+                        <p>A word is any sequence of characters separated by spaces. "Hello-world" counts as one word.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>How are sentences counted?</h4>
+                        <p>Sentences are detected by punctuation marks: periods, exclamation points, and question marks.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2023 Character Counter Tool | | All processing happens in your browser - no files are uploaded to any server</p>
+           
+        </footer>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const textInput = document.getElementById('text-input');
+        const charCount = document.getElementById('char-count');
+        const wordCount = document.getElementById('word-count');
+        const sentenceCount = document.getElementById('sentence-count');
+        const paragraphCount = document.getElementById('paragraph-count');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        
+        // Initialize with example text
+        window.addEventListener('DOMContentLoaded', () => {
+            updateCounts();
+        });
+        
+        // Update counts as user types
+        textInput.addEventListener('input', updateCounts);
+        
+        // Update all counts and progress
+        function updateCounts() {
+            const text = textInput.value;
+            
+            // Character count (including spaces)
+            const charCountValue = text.length;
+            charCount.textContent = charCountValue.toLocaleString();
+            
+            // Word count
+            const words = text.match(/\b\w+\b/g) || [];
+            const wordCountValue = words.length;
+            wordCount.textContent = wordCountValue.toLocaleString();
+            
+            // Sentence count
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            const sentenceCountValue = sentences.length;
+            sentenceCount.textContent = sentenceCountValue.toLocaleString();
+            
+            // Paragraph count
+            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+            const paragraphCountValue = paragraphs.length;
+            paragraphCount.textContent = paragraphCountValue.toLocaleString();
+            
+            // Progress indicator (based on 280 character Twitter limit)
+            const maxChars = 280;
+            const progressPercentage = Math.min(100, (charCountValue / maxChars) * 100);
+            progressFill.style.width = `${progressPercentage}%`;
+            
+            // Update progress text
+            progressText.textContent = charCountValue > maxChars ? 
+                `Exceeded limit by ${charCountValue - maxChars} characters` : 
+                `${maxChars - charCountValue} characters remaining`;
+            
+            // Change progress color based on usage
+            if (progressPercentage > 90) {
+                progressFill.style.background = 'linear-gradient(to right, var(--warning), var(--danger))';
+            } else if (progressPercentage > 70) {
+                progressFill.style.background = 'linear-gradient(to right, var(--accent), var(--warning))';
+            } else {
+                progressFill.style.background = 'linear-gradient(to right, var(--accent), var(--primary))';
+            }
+        }
+        
+        // Copy text to clipboard
+        function copyText() {
+            textInput.select();
+            document.execCommand('copy');
+            alert('Text copied to clipboard!');
+        }
+        
+        // Clear text area
+        function clearText() {
+            textInput.value = '';
+            updateCounts();
+        }
+        
+        // Reset counter and text
+        function resetCounter() {
+            textInput.value = '';
+            updateCounts();
+            progressFill.style.background = 'linear-gradient(to right, var(--accent), var(--primary))';
+        }
+    </script>
+</body>
+</html>
