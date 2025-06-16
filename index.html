@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebTools Directory - Find the Best Online Tools</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-bar {
+            max-width: 600px;
+            margin: 2rem auto;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.7rem 1.5rem;
+            cursor: pointer;
+        }
+        
+        main {
+            padding: 3rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            display: inline-block;
+            background-color: white;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #ddd;
+            z-index: 0;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .category-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .category-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .category-card h3 i {
+            margin-right: 0.5rem;
+        }
+        
+        .category-card ul {
+            list-style: none;
+        }
+        
+        .category-card ul li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        
+        .category-card ul li::before {
+            content: "•";
+            color: var(--secondary-color);
+            position: absolute;
+            left: 0;
+        }
+        
+        .category-card ul li a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            transition: color 0.3s;
+        }
+        
+        .category-card ul li a:hover {
+            color: var(--primary-color);
+        }
+        
+        .quick-access {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 3rem;
+        }
+        
+        .quick-access-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .quick-access-item {
+            background-color: var(--light-gray);
+            padding: 1rem;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .quick-access-item a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+        
+        .quick-access-item:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .quick-access-item:hover a {
+            color: white;
+        }
+        
+        footer {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-column ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column ul li a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid #444;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+            }
+            
+            nav ul li {
+                margin-left: 1rem;
+                margin-right: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Web<span>Tools</span></div>
+            <nav>
+                <ul>
+                    <li><a href="#categories">Categories</a></li>
+                    <li><a href="#quick-access">Quick Access</a></li>
+                    <li><a href="#resources">Resources</a></li>
+                    <li><a href="#submit">Submit Tool</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="container">
+            <h1>Discover the Best Web Tools for Your Projects</h1>
+            <p>Thousands of free and premium tools for developers, designers, marketers, and more</p>
+            <div class="search-bar">
+                <input type="text" placeholder="Search for tools...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+        </div>
+    </section>
+    
+    <main class="container">
+        <section id="categories">
+            <div class="section-title">
+                <h2>Tool Categories</h2>
+            </div>
+            
+            <div class="categories-grid">
+                <!-- Development Tools -->
+                <div class="category-card">
+                    <h3><i class="fas fa-code"></i> Development Tools</h3>
+                    <ul>
+                        <li><a href="#">Code Editors</a></li>
+                        <li><a href="#">IDEs</a></li>
+                        <li><a href="#">Version Control</a></li>
+                        <li><a href="#">API Testing</a></li>
+                        <li><a href="#">Database Tools</a></li>
+                        <li><a href="#">Local Development</a></li>
+                        <li><a href="#">Package Managers</a></li>
+                        <li><a href="#">Code Formatters</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Design Tools -->
+                <div class="category-card">
+                    <h3><i class="fas fa-paint-brush"></i> Design Tools</h3>
+                    <ul>
+                        <li><a href="#">Graphic Design</a></li>
+                        <li><a href="#">UI/UX Design</a></li>
+                        <li><a href="#">Prototyping</a></li>
+                        <li><a href="#">Color Palettes</a></li>
+                        <li><a href="#">Font Tools</a></li>
+                        <li><a href="#">Icon Libraries</a></li>
+                        <li><a href="#">Design Inspiration</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Productivity Tools -->
+                <div class="category-card">
+                    <h3><i class="fas fa-tasks"></i> Productivity Tools</h3>
+                    <ul>
+                        <li><a href="#">Note Taking</a></li>
+                        <li><a href="#">Task Management</a></li>
+                        <li><a href="#">Time Tracking</a></li>
+                        <li><a href="#">Calendar Apps</a></li>
+                        <li><a href="#">Email Tools</a></li>
+                        <li><a href="#">Document Collaboration</a></li>
+                        <li><a href="#">Password Managers</a></li>
+                    </ul>
+                </div>
+                
+                <!-- SEO & Marketing Tools -->
+                <div class="category-card">
+                    <h3><i class="fas fa-chart-line"></i> SEO & Marketing</h3>
+                    <ul>
+                        <li><a href="#">Keyword Research</a></li>
+                        <li><a href="#">SEO Analytics</a></li>
+                        <li><a href="#">Social Media Management</a></li>
+                        <li><a href="#">Email Marketing</a></li>
+                        <li><a href="#">Content Marketing</a></li>
+                        <li><a href="#">Advertising Tools</a></li>
+                        <li><a href="#">Landing Page Builders</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Performance Optimization -->
+                <div class="category-card">
+                    <h3><i class="fas fa-tachometer-alt"></i> Performance</h3>
+                    <ul>
+                        <li><a href="#">Website Speed Test</a></li>
+                        <li><a href="#">Image Optimization</a></li>
+                        <li><a href="#">Code Minification</a></li>
+                        <li><a href="#">CDN Services</a></li>
+                        <li><a href="#">Caching Tools</a></li>
+                        <li><a href="#">Performance Monitoring</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Security Tools -->
+                <div class="category-card">
+                    <h3><i class="fas fa-shield-alt"></i> Security Tools</h3>
+                    <ul>
+                        <li><a href="#">Vulnerability Scanners</a></li>
+                        <li><a href="#">SSL Checkers</a></li>
+                        <li><a href="#">Password Strength Testers</a></li>
+                        <li><a href="#">Encryption Tools</a></li>
+                        <li><a href="#">Firewall Services</a></li>
+                        <li><a href="#">Malware Scanners</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Content Creation -->
+                <div class="category-card">
+                    <h3><i class="fas fa-photo-video"></i> Content Creation</h3>
+                    <ul>
+                        <li><a href="#">Video Editing</a></li>
+                        <li><a href="#">Audio Tools</a></li>
+                        <li><a href="#">Screen Recording</a></li>
+                        <li><a href="#">Image Editing</a></li>
+                        <li><a href="#">PDF Tools</a></li>
+                        <li><a href="#">Infographic Makers</a></li>
+                        <li><a href="#">Content Generators</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Analytics & Data -->
+                <div class="category-card">
+                    <h3><i class="fas fa-chart-pie"></i> Analytics & Data</h3>
+                    <ul>
+                        <li><a href="#">Web Analytics</a></li>
+                        <li><a href="#">Heatmap Tools</a></li>
+                        <li><a href="#">A/B Testing</a></li>
+                        <li><a href="#">Data Visualization</a></li>
+                        <li><a href="#">Survey Tools</a></li>
+                        <li><a href="#">Customer Feedback</a></li>
+                    </ul>
+                </div>
+                
+                <!-- E-commerce Tools -->
+                <div class="category-card">
+                    <h3><i class="fas fa-shopping-cart"></i> E-commerce</h3>
+                    <ul>
+                        <li><a href="#">Shopping Cart Solutions</a></li>
+                        <li><a href="#">Payment Processors</a></li>
+                        <li><a href="#">Product Mockup Generators</a></li>
+                        <li><a href="#">Dropshipping Tools</a></li>
+                        <li><a href="#">Inventory Management</a></li>
+                        <li><a href="#">Conversion Optimization</a></li>
+                    </ul>
+                </div>
+                
+                <!-- AI & Machine Learning -->
+                <div class="category-card">
+                    <h3><i class="fas fa-robot"></i> AI & ML</h3>
+                    <ul>
+                        <li><a href="#">AI Writing Assistants</a></li>
+                        <li><a href="#">Chatbot Builders</a></li>
+                        <li><a href="#">Image Generation</a></li>
+                        <li><a href="#">Data Analysis Tools</a></li>
+                        <li><a href="#">Machine Learning Platforms</a></li>
+                        <li><a href="#">Natural Language Processing</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Cloud Services -->
+                <div class="category-card">
+                    <h3><i class="fas fa-cloud"></i> Cloud Services</h3>
+                    <ul>
+                        <li><a href="#">Cloud Storage</a></li>
+                        <li><a href="#">Cloud Hosting</a></li>
+                        <li><a href="#">Serverless Platforms</a></li>
+                        <li><a href="#">Container Services</a></li>
+                        <li><a href="#">Backup Solutions</a></li>
+                        <li><a href="#">Cloud Computing</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Networking Tools -->
+                <div class="category-card">
+                    <h3><i class="fas fa-network-wired"></i> Networking</h3>
+                    <ul>
+                        <li><a href="#">Domain Name Services</a></li>
+                        <li><a href="#">Web Hosting</a></li>
+                        <li><a href="#">SSL Certificates</a></li>
+                        <li><a href="#">Email Hosting</a></li>
+                        <li><a href="#">VPN Services</a></li>
+                        <li><a href="#">Network Monitoring</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Accessibility Tools -->
+                <div class="category-card">
+                    <h3><i class="fas fa-universal-access"></i> Accessibility</h3>
+                    <ul>
+                        <li><a href="#">Screen Readers</a></li>
+                        <li><a href="#">Color Contrast Checkers</a></li>
+                        <li><a href="#">Accessibility Validators</a></li>
+                        <li><a href="#">Readability Tools</a></li>
+                        <li><a href="#">Keyboard Navigation Testers</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Miscellaneous Tools -->
+                <div class="category-card">
+                    <h3><i class="fas fa-random"></i> Miscellaneous</h3>
+                    <ul>
+                        <li><a href="#">File Converters</a></li>
+                        <li><a href="#">QR Code Generators</a></li>
+                        <li><a href="#">Barcode Generators</a></li>
+                        <li><a href="#">Gradient Generators</a></li>
+                        <li><a href="#">Fake Data Generators</a></li>
+                        <li><a href="#">Unit Converters</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="quick-access">
+            <div class="section-title">
+                <h2>Quick Access</h2>
+            </div>
+            
+            <div class="quick-access">
+                <div class="quick-access-grid">
+                    <div class="quick-access-item">
+                        <a href="#">Popular Tools</a>
+                    </div>
+                    <div class="quick-access-item">
+                        <a href="#">Recently Added</a>
+                    </div>
+                    <div class="quick-access-item">
+                        <a href="#">Staff Picks</a>
+                    </div>
+                    <div class="quick-access-item">
+                        <a href="#">Free Tools</a>
+                    </div>
+                    <div class="quick-access-item">
+                        <a href="#">Premium Tools</a>
+                    </div>
+                    <div class="quick-access-item">
+                        <a href="#">Browser Extensions</a>
+                    </div>
+                    <div class="quick-access-item">
+                        <a href="#">Mobile Apps</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="resources">
+            <div class="section-title">
+                <h2>User Resources</h2>
+            </div>
+            
+            <div class="categories-grid">
+                <div class="category-card">
+                    <h3><i class="fas fa-exchange-alt"></i> Tool Comparisons</h3>
+                    <ul>
+                        <li><a href="#">Code Editors Comparison</a></li>
+                        <li><a href="#">SEO Tools Face-Off</a></li>
+                        <li><a href="#">Best Design Tools 2023</a></li>
+                        <li><a href="#">Top Productivity Apps</a></li>
+                    </ul>
+                </div>
+                
+                <div class="category-card">
+                    <h3><i class="fas fa-book"></i> How-To Guides</h3>
+                    <ul>
+                        <li><a href="#">Getting Started with Git</a></li>
+                        <li><a href="#">Web Performance Optimization</a></li>
+                        <li><a href="#">Design System Basics</a></li>
+                        <li><a href="#">SEO for Beginners</a></li>
+                    </ul>
+                </div>
+                
+                <div class="category-card">
+                    <h3><i class="fas fa-star"></i> Tool Reviews</h3>
+                    <ul>
+                        <li><a href="#">VS Code Review</a></li>
+                        <li><a href="#">Figma Deep Dive</a></li>
+                        <li><a href="#">Notion Review</a></li>
+                        <li><a href="#">Ahrefs vs SEMrush</a></li>
+                    </ul>
+                </div>
+                
+                <div class="category-card">
+                    <h3><i class="fas fa-users"></i> Community</h3>
+                    <ul>
+                        <li><a href="#">User Ratings</a></li>
+                        <li><a href="#">Submit a Tool</a></li>
+                        <li><a href="#">Newsletter</a></li>
+                        <li><a href="#">Community Forum</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>WebTools</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Categories</h3>
+                    <ul>
+                        <li><a href="#">Development</a></li>
+                        <li><a href="#">Design</a></li>
+                        <li><a href="#">Productivity</a></li>
+                        <li><a href="#">SEO & Marketing</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Newsletter</a></li>
+                        <li><a href="#">API</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                        <li><a href="#"><i class="fab fa-github"></i> GitHub</a></li>
+                        <li><a href="#"><i class="fab fa-discord"></i> Discord</a></li>
+                        <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 WebTools Directory. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
