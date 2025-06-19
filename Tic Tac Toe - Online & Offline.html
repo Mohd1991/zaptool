@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe - Real Multiplayer</title>
+    <title>Tic Tac Toe - Online & Offline</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,15 +12,39 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
+        
         h1 {
             text-align: center;
             color: #333;
         }
-        .game-container {
+        
+        .mode-selector {
             display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        
+        .mode-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .game-container {
+            display: none;
             flex-direction: column;
             align-items: center;
         }
+        
         .board {
             display: grid;
             grid-template-columns: repeat(3, 100px);
@@ -28,6 +52,7 @@
             gap: 5px;
             margin: 20px 0;
         }
+        
         .cell {
             width: 100px;
             height: 100px;
@@ -40,93 +65,96 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        
         .cell:hover {
             background-color: #f0f0f0;
         }
+        
         .status {
             font-size: 20px;
             margin-bottom: 20px;
-            font-weight: bold;
             text-align: center;
-            min-height: 60px;
         }
-        .online-controls {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 20px;
-        }
-        .online-controls input, .online-controls button {
-            margin: 5px 0;
-            padding: 10px;
-            font-size: 16px;
-        }
-        .online-controls button {
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .online-controls button:hover {
-            background-color: #0b7dda;
-        }
-        .team-info {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #e9e9e9;
-            border-radius: 5px;
-        }
+        
         .reset-btn {
             padding: 10px 20px;
             font-size: 16px;
+            cursor: pointer;
             background-color: #f44336;
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
         }
+        
         .reset-btn:hover {
             background-color: #d32f2f;
         }
-        .highlight {
-            background-color: #a5d6a7 !important;
+        
+        .online-panel {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        
+        .online-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
         }
+        
+        .online-input {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .online-btn {
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        
+        .online-btn:hover {
+            background-color: #0b7dda;
+        }
+        
+        .player-list {
+            margin-top: 20px;
+        }
+        
+        .player-item {
+            padding: 8px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        
         .waiting-message {
-            text-align: center;
-            margin: 20px 0;
+            font-style: italic;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <h1>Tic Tac Toe - Real Multiplayer</h1>
+    <h1>Tic Tac Toe</h1>
     
-    <div class="game-container" id="game-container">
-        <div class="online-controls" id="online-controls">
-            <div id="create-section">
-                <input type="text" id="team-name" placeholder="Enter game name" value="My Game">
-                <button id="create-team-btn">Create Game</button>
-            </div>
-            <div id="join-section">
-                <input type="text" id="join-code" placeholder="Enter game code">
-                <button id="join-team-btn">Join Game</button>
-            </div>
-            <div class="team-info" id="team-info" style="display: none;">
-                <p>Game: <span id="display-team-name"></span></p>
-                <p>Code: <span id="display-team-code"></span></p>
-                <p>Status: <span id="team-status">Waiting for opponent...</span></p>
-            </div>
-        </div>
-        
-        <div class="status" id="status"></div>
-        
-        <div class="board" id="board" style="display: none;">
+    <div class="mode-selector">
+        <button class="mode-btn" id="offline-btn">Offline (vs Computer)</button>
+        <button class="mode-btn" id="online-btn">Online Multiplayer</button>
+    </div>
+    
+    <div class="game-container" id="offline-game">
+        <div class="status" id="offline-status">Your turn (X)</div>
+        <div class="board" id="offline-board">
             <div class="cell" data-index="0"></div>
             <div class="cell" data-index="1"></div>
             <div class="cell" data-index="2"></div>
@@ -137,349 +165,412 @@
             <div class="cell" data-index="7"></div>
             <div class="cell" data-index="8"></div>
         </div>
+        <button class="reset-btn" id="offline-reset">Reset Game</button>
+    </div>
+    
+    <div class="game-container" id="online-game">
+        <div class="status" id="online-status">Connecting...</div>
+        <div class="board" id="online-board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <button class="reset-btn" id="online-reset">Reset Game</button>
         
-        <button class="reset-btn" id="reset-btn" style="display: none;">Play Again</button>
+        <div class="online-panel" id="online-panel">
+            <div class="online-controls">
+                <input type="text" class="online-input" id="player-name" placeholder="Your Name">
+                <input type="text" class="online-input" id="room-id" placeholder="Room ID (leave empty to create)">
+                <button class="online-btn" id="join-btn">Join/Create Room</button>
+            </div>
+            <div class="player-list" id="player-list">
+                <div class="waiting-message">Waiting for players to join...</div>
+            </div>
+        </div>
     </div>
     
     <script>
-        // Game state
-        let currentPlayer = 'X';
-        let gameBoard = ['', '', '', '', '', '', '', '', ''];
-        let gameActive = false;
-        let mySymbol = '';
-        let gameId = '';
-        let playerId = '';
-        let teamName = '';
-        
-        // Simulated WebSocket using localStorage
-        const CHANNEL = 'tic_tac_toe_multiplayer';
-        let isHost = false;
-        
-        // DOM elements
-        const gameContainer = document.getElementById('game-container');
-        const statusDisplay = document.getElementById('status');
-        const board = document.getElementById('board');
-        const onlineControls = document.getElementById('online-controls');
-        const createTeamBtn = document.getElementById('create-team-btn');
-        const joinTeamBtn = document.getElementById('join-team-btn');
-        const teamNameInput = document.getElementById('team-name');
-        const joinCodeInput = document.getElementById('join-code');
-        const teamInfo = document.getElementById('team-info');
-        const displayTeamName = document.getElementById('display-team-name');
-        const displayTeamCode = document.getElementById('display-team-code');
-        const teamStatusDisplay = document.getElementById('team-status');
-        const resetBtn = document.getElementById('reset-btn');
-        const createSection = document.getElementById('create-section');
-        const joinSection = document.getElementById('join-section');
-        
-        // Initialize simulated WebSocket
-        function setupLocalStorageListener() {
-            window.addEventListener('storage', (event) => {
-                if (event.key === CHANNEL && event.newValue) {
-                    const data = JSON.parse(event.newValue);
-                    if (data.gameId === gameId) {
-                        handleMessage(data);
-                    }
-                }
-            });
-        }
-        
-        function sendMessage(data) {
-            localStorage.setItem(CHANNEL, JSON.stringify(data));
-            localStorage.removeItem(CHANNEL); // Trigger event
-        }
-        
-        // Handle incoming messages
-        function handleMessage(data) {
-            switch (data.type) {
-                case 'game_created':
-                    handleGameCreated(data);
-                    break;
-                case 'player_joined':
-                    handlePlayerJoined(data);
-                    break;
-                case 'move':
-                    handleMoveReceived(data);
-                    break;
-                case 'restart':
-                    handleRestartReceived(data);
-                    break;
-                case 'player_left':
-                    handlePlayerLeft();
-                    break;
-            }
-        }
-        
-        function handleGameCreated(data) {
-            gameId = data.gameId;
-            playerId = data.playerId;
-            mySymbol = 'X';
-            teamName = data.teamName;
-            isHost = true;
+        // Offline Game Logic
+        const offlineGame = {
+            board: ['', '', '', '', '', '', '', '', ''],
+            currentPlayer: 'X',
+            gameActive: true,
             
-            displayTeamName.textContent = teamName;
-            displayTeamCode.textContent = gameId;
-            teamStatusDisplay.textContent = 'Waiting for opponent...';
+            init: function() {
+                this.bindEvents();
+                this.updateStatus(`Your turn (${this.currentPlayer})`);
+            },
             
-            teamInfo.style.display = 'block';
-            createSection.style.display = 'none';
-            statusDisplay.textContent = 'Waiting for an opponent to join...';
-        }
-        
-        function handlePlayerJoined(data) {
-            gameId = data.gameId;
-            playerId = data.playerId;
-            mySymbol = 'O';
-            teamName = data.teamName;
-            isHost = false;
+            bindEvents: function() {
+                document.getElementById('offline-board').addEventListener('click', this.handleCellClick.bind(this));
+                document.getElementById('offline-reset').addEventListener('click', this.resetGame.bind(this));
+            },
             
-            displayTeamName.textContent = teamName;
-            displayTeamCode.textContent = gameId;
-            teamStatusDisplay.textContent = 'Game ready!';
-            
-            teamInfo.style.display = 'block';
-            joinSection.style.display = 'none';
-            board.style.display = 'grid';
-            
-            gameActive = true;
-            currentPlayer = 'X';
-            
-            updateStatus();
-            
-            // Notify host that we joined
-            sendMessage({
-                type: 'player_joined_ack',
-                gameId,
-                playerId,
-                teamName
-            });
-        }
-        
-        function handleMoveReceived(data) {
-            // Update game board
-            gameBoard = data.board;
-            updateBoard();
-            
-            // Update game state
-            currentPlayer = data.currentPlayer;
-            
-            if (data.status === 'finished') {
-                gameActive = false;
-                if (data.winner === 'draw') {
-                    statusDisplay.textContent = 'Game ended in a draw!';
-                } else if (data.winner === mySymbol) {
-                    statusDisplay.textContent = 'You won!';
-                } else {
-                    statusDisplay.textContent = 'You lost!';
-                }
-                resetBtn.style.display = 'block';
-                highlightWinningCells(data.board);
-            } else {
-                updateStatus();
-            }
-        }
-        
-        function handleRestartReceived(data) {
-            gameBoard = data.board;
-            currentPlayer = data.currentPlayer;
-            gameActive = true;
-            
-            updateBoard();
-            updateStatus();
-            resetBtn.style.display = 'none';
-            
-            // Remove highlights
-            document.querySelectorAll('.cell').forEach(cell => {
-                cell.classList.remove('highlight');
-            });
-        }
-        
-        function handlePlayerLeft() {
-            gameActive = false;
-            statusDisplay.textContent = 'Opponent disconnected. Waiting for them to reconnect...';
-        }
-        
-        // Event listeners
-        createTeamBtn.addEventListener('click', createGame);
-        joinTeamBtn.addEventListener('click', joinGame);
-        resetBtn.addEventListener('click', requestRestart);
-        
-        // Initialize cells
-        document.querySelectorAll('.cell').forEach(cell => {
-            cell.addEventListener('click', handleCellClick);
-        });
-        
-        // Game functions
-        function createGame() {
-            const name = teamNameInput.value.trim();
-            if (!name) {
-                alert('Please enter a game name');
-                return;
-            }
-            
-            gameId = generateGameCode();
-            playerId = generatePlayerId();
-            teamName = name;
-            
-            sendMessage({
-                type: 'game_created',
-                gameId,
-                playerId,
-                teamName: name
-            });
-            
-            // Handle our own message (since storage event won't fire for same tab)
-            handleGameCreated({
-                gameId,
-                playerId,
-                teamName: name
-            });
-        }
-        
-        function joinGame() {
-            const code = joinCodeInput.value.trim().toUpperCase();
-            if (!code) {
-                alert('Please enter a game code');
-                return;
-            }
-            
-            playerId = generatePlayerId();
-            gameId = code;
-            
-            sendMessage({
-                type: 'player_joined',
-                gameId,
-                playerId
-            });
-            
-            // Handle our own message
-            handlePlayerJoined({
-                gameId,
-                playerId,
-                teamName: 'Game ' + code // Default name
-            });
-        }
-        
-        function handleCellClick(e) {
-            if (!gameActive) return;
-            if (currentPlayer !== mySymbol) return;
-            
-            const cell = e.target;
-            const cellIndex = parseInt(cell.getAttribute('data-index'));
-            
-            if (gameBoard[cellIndex] !== '') return;
-            
-            // Make move
-            gameBoard[cellIndex] = mySymbol;
-            cell.textContent = mySymbol;
-            
-            // Check for winner
-            const winner = checkWinner(gameBoard);
-            const isDraw = checkDraw(gameBoard);
-            
-            sendMessage({
-                type: 'move',
-                gameId,
-                index: cellIndex,
-                symbol: mySymbol,
-                board: gameBoard,
-                currentPlayer: mySymbol === 'X' ? 'O' : 'X',
-                status: winner || isDraw ? 'finished' : 'active',
-                winner: winner || (isDraw ? 'draw' : null)
-            });
-            
-            // Handle our own message
-            handleMoveReceived({
-                board: gameBoard,
-                currentPlayer: mySymbol === 'X' ? 'O' : 'X',
-                status: winner || isDraw ? 'finished' : 'active',
-                winner: winner || (isDraw ? 'draw' : null)
-            });
-        }
-        
-        function requestRestart() {
-            sendMessage({
-                type: 'restart',
-                gameId,
-                board: ['', '', '', '', '', '', '', '', ''],
-                currentPlayer: 'X'
-            });
-            
-            // Handle our own message
-            handleRestartReceived({
-                board: ['', '', '', '', '', '', '', '', ''],
-                currentPlayer: 'X'
-            });
-        }
-        
-        function updateBoard() {
-            document.querySelectorAll('.cell').forEach((cell, index) => {
-                cell.textContent = gameBoard[index];
-            });
-        }
-        
-        function updateStatus() {
-            if (currentPlayer === mySymbol) {
-                statusDisplay.textContent = 'Your turn (' + mySymbol + ')';
-            } else {
-                statusDisplay.textContent = 'Waiting for opponent...';
-            }
-        }
-        
-        function highlightWinningCells(board) {
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-                [0, 4, 8], [2, 4, 6]             // diagonals
-            ];
-            
-            for (const pattern of winPatterns) {
-                const [a, b, c] = pattern;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    document.querySelector(`.cell[data-index="${a}"]`).classList.add('highlight');
-                    document.querySelector(`.cell[data-index="${b}"]`).classList.add('highlight');
-                    document.querySelector(`.cell[data-index="${c}"]`).classList.add('highlight');
+            handleCellClick: function(e) {
+                if (!this.gameActive) return;
+                
+                const cell = e.target;
+                const index = parseInt(cell.getAttribute('data-index'));
+                
+                if (this.board[index] !== '') return;
+                
+                this.board[index] = this.currentPlayer;
+                cell.textContent = this.currentPlayer;
+                
+                if (this.checkWin()) {
+                    this.updateStatus(`You win! (${this.currentPlayer})`);
+                    this.gameActive = false;
                     return;
                 }
-            }
-        }
-        
-        function checkWinner(board) {
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-                [0, 4, 8], [2, 4, 6]             // diagonals
-            ];
+                
+                if (this.checkDraw()) {
+                    this.updateStatus("Game ended in a draw!");
+                    this.gameActive = false;
+                    return;
+                }
+                
+                this.switchPlayer();
+                this.updateStatus(`Your turn (${this.currentPlayer})`);
+                
+                // Computer's turn
+                if (this.currentPlayer === 'O') {
+                    setTimeout(() => this.computerMove(), 500);
+                }
+            },
             
-            for (const pattern of winPatterns) {
-                const [a, b, c] = pattern;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    return board[a];
+            computerMove: function() {
+                if (!this.gameActive) return;
+                
+                // Simple AI - random move
+                let emptyCells = [];
+                for (let i = 0; i < 9; i++) {
+                    if (this.board[i] === '') emptyCells.push(i);
+                }
+                
+                if (emptyCells.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+                    const moveIndex = emptyCells[randomIndex];
+                    
+                    this.board[moveIndex] = 'O';
+                    document.querySelector(`#offline-board .cell[data-index="${moveIndex}"]`).textContent = 'O';
+                    
+                    if (this.checkWin()) {
+                        this.updateStatus("Computer wins!");
+                        this.gameActive = false;
+                        return;
+                    }
+                    
+                    if (this.checkDraw()) {
+                        this.updateStatus("Game ended in a draw!");
+                        this.gameActive = false;
+                        return;
+                    }
+                    
+                    this.switchPlayer();
+                    this.updateStatus(`Your turn (${this.currentPlayer})`);
+                }
+            },
+            
+            checkWin: function() {
+                const winPatterns = [
+                    [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                    [0, 4, 8], [2, 4, 6]             // diagonals
+                ];
+                
+                return winPatterns.some(pattern => {
+                    return pattern.every(index => {
+                        return this.board[index] === this.currentPlayer;
+                    });
+                });
+            },
+            
+            checkDraw: function() {
+                return this.board.every(cell => cell !== '');
+            },
+            
+            switchPlayer: function() {
+                this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+            },
+            
+            updateStatus: function(message) {
+                document.getElementById('offline-status').textContent = message;
+            },
+            
+            resetGame: function() {
+                this.board = ['', '', '', '', '', '', '', '', ''];
+                this.currentPlayer = 'X';
+                this.gameActive = true;
+                
+                document.querySelectorAll('#offline-board .cell').forEach(cell => {
+                    cell.textContent = '';
+                });
+                
+                this.updateStatus(`Your turn (${this.currentPlayer})`);
+            }
+        };
+        
+        // Online Game Logic (simulated with localStorage for demo)
+        const onlineGame = {
+            board: ['', '', '', '', '', '', '', '', ''],
+            currentPlayer: 'X',
+            gameActive: false,
+            playerName: '',
+            roomId: '',
+            isHost: false,
+            players: [],
+            mySymbol: '',
+            lastUpdate: 0,
+            
+            init: function() {
+                this.bindEvents();
+                this.updateStatus("Enter your name and room ID to start");
+                
+                // Simulate server polling
+                setInterval(() => this.checkGameUpdate(), 1000);
+            },
+            
+            bindEvents: function() {
+                document.getElementById('online-board').addEventListener('click', this.handleCellClick.bind(this));
+                document.getElementById('online-reset').addEventListener('click', this.resetGame.bind(this));
+                document.getElementById('join-btn').addEventListener('click', this.joinRoom.bind(this));
+            },
+            
+            joinRoom: function() {
+                this.playerName = document.getElementById('player-name').value.trim();
+                this.roomId = document.getElementById('room-id').value.trim();
+                
+                if (!this.playerName) {
+                    alert("Please enter your name");
+                    return;
+                }
+                
+                if (!this.roomId) {
+                    // Create new room
+                    this.roomId = 'room-' + Math.random().toString(36).substr(2, 8);
+                    document.getElementById('room-id').value = this.roomId;
+                    this.isHost = true;
+                    this.mySymbol = 'X';
+                    this.gameActive = true;
+                    this.players = [{name: this.playerName, symbol: 'X'}];
+                    
+                    // Save room to "server" (localStorage)
+                    this.saveGameState();
+                    
+                    this.updateStatus(`Room created. Waiting for opponent... (You are X)`);
+                    this.updatePlayerList();
+                } else {
+                    // Join existing room
+                    const roomData = this.getRoomData(this.roomId);
+                    
+                    if (!roomData) {
+                        alert("Room not found");
+                        return;
+                    }
+                    
+                    if (roomData.players.length >= 2) {
+                        alert("Room is full");
+                        return;
+                    }
+                    
+                    this.isHost = false;
+                    this.mySymbol = 'O';
+                    this.gameActive = true;
+                    this.players = roomData.players.concat([{name: this.playerName, symbol: 'O'}]);
+                    this.board = roomData.board;
+                    this.currentPlayer = roomData.currentPlayer;
+                    
+                    // Update room on "server"
+                    this.saveGameState();
+                    
+                    this.updateStatus(`Joined room. You are O. ${this.currentPlayer === this.mySymbol ? 'Your turn' : 'Waiting for opponent...'}`);
+                    this.updatePlayerList();
+                    this.updateBoard();
+                }
+            },
+            
+            handleCellClick: function(e) {
+                if (!this.gameActive || this.currentPlayer !== this.mySymbol) return;
+                
+                const cell = e.target;
+                const index = parseInt(cell.getAttribute('data-index'));
+                
+                if (this.board[index] !== '') return;
+                
+                this.board[index] = this.mySymbol;
+                cell.textContent = this.mySymbol;
+                
+                if (this.checkWin()) {
+                    this.updateStatus(`You win! (${this.mySymbol})`);
+                    this.gameActive = false;
+                    this.saveGameState();
+                    return;
+                }
+                
+                if (this.checkDraw()) {
+                    this.updateStatus("Game ended in a draw!");
+                    this.gameActive = false;
+                    this.saveGameState();
+                    return;
+                }
+                
+                this.switchPlayer();
+                this.updateStatus(`Waiting for ${this.currentPlayer} to play...`);
+                this.saveGameState();
+            },
+            
+            checkWin: function() {
+                const winPatterns = [
+                    [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                    [0, 4, 8], [2, 4, 6]             // diagonals
+                ];
+                
+                return winPatterns.some(pattern => {
+                    return pattern.every(index => {
+                        return this.board[index] === this.currentPlayer;
+                    });
+                });
+            },
+            
+            checkDraw: function() {
+                return this.board.every(cell => cell !== '');
+            },
+            
+            switchPlayer: function() {
+                this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+            },
+            
+            updateStatus: function(message) {
+                document.getElementById('online-status').textContent = message;
+            },
+            
+            updateBoard: function() {
+                this.board.forEach((cell, index) => {
+                    document.querySelector(`#online-board .cell[data-index="${index}"]`).textContent = cell;
+                });
+            },
+            
+            updatePlayerList: function() {
+                const playerList = document.getElementById('player-list');
+                playerList.innerHTML = '';
+                
+                if (this.players.length === 0) {
+                    playerList.innerHTML = '<div class="waiting-message">Waiting for players to join...</div>';
+                    return;
+                }
+                
+                this.players.forEach(player => {
+                    const playerItem = document.createElement('div');
+                    playerItem.className = 'player-item';
+                    playerItem.textContent = `${player.name} (${player.symbol})`;
+                    if (player.symbol === this.mySymbol) {
+                        playerItem.style.fontWeight = 'bold';
+                    }
+                    playerList.appendChild(playerItem);
+                });
+            },
+            
+            resetGame: function() {
+                if (!this.isHost) {
+                    alert("Only the room creator can reset the game");
+                    return;
+                }
+                
+                this.board = ['', '', '', '', '', '', '', '', ''];
+                this.currentPlayer = 'X';
+                this.gameActive = true;
+                
+                document.querySelectorAll('#online-board .cell').forEach(cell => {
+                    cell.textContent = '';
+                });
+                
+                this.updateStatus(`Game reset. ${this.currentPlayer === this.mySymbol ? 'Your turn' : 'Waiting for opponent...'}`);
+                this.saveGameState();
+            },
+            
+            saveGameState: function() {
+                const gameData = {
+                    board: this.board,
+                    currentPlayer: this.currentPlayer,
+                    players: this.players,
+                    gameActive: this.gameActive,
+                    lastUpdate: Date.now()
+                };
+                
+                localStorage.setItem(`tic-tac-toe-room-${this.roomId}`, JSON.stringify(gameData));
+            },
+            
+            getRoomData: function(roomId) {
+                const data = localStorage.getItem(`tic-tac-toe-room-${roomId}`);
+                return data ? JSON.parse(data) : null;
+            },
+            
+            checkGameUpdate: function() {
+                if (!this.roomId || !this.gameActive) return;
+                
+                const roomData = this.getRoomData(this.roomId);
+                if (!roomData) return;
+                
+                if (roomData.lastUpdate > this.lastUpdate) {
+                    this.lastUpdate = roomData.lastUpdate;
+                    
+                    // Update game state
+                    this.board = roomData.board;
+                    this.currentPlayer = roomData.currentPlayer;
+                    this.gameActive = roomData.gameActive;
+                    this.players = roomData.players;
+                    
+                    // Update UI
+                    this.updateBoard();
+                    this.updatePlayerList();
+                    
+                    if (this.gameActive) {
+                        if (this.currentPlayer === this.mySymbol) {
+                            this.updateStatus(`Your turn (${this.mySymbol})`);
+                        } else {
+                            this.updateStatus(`Waiting for ${this.currentPlayer} to play...`);
+                        }
+                    } else {
+                        if (this.checkWin()) {
+                            const winner = this.players.find(p => p.symbol === this.currentPlayer);
+                            if (winner) {
+                                if (winner.symbol === this.mySymbol) {
+                                    this.updateStatus(`You win! (${this.mySymbol})`);
+                                } else {
+                                    this.updateStatus(`${winner.name} wins! (${winner.symbol})`);
+                                }
+                            }
+                        } else if (this.checkDraw()) {
+                            this.updateStatus("Game ended in a draw!");
+                        }
+                    }
                 }
             }
-            
-            return null;
-        }
+        };
         
-        function checkDraw(board) {
-            return board.every(cell => cell !== '');
-        }
+        // Mode Selection
+        document.getElementById('offline-btn').addEventListener('click', function() {
+            document.getElementById('offline-game').style.display = 'flex';
+            document.getElementById('online-game').style.display = 'none';
+            offlineGame.init();
+        });
         
-        function generateGameCode() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let result = '';
-            for (let i = 0; i < 6; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
+        document.getElementById('online-btn').addEventListener('click', function() {
+            document.getElementById('offline-game').style.display = 'none';
+            document.getElementById('online-game').style.display = 'flex';
+            document.getElementById('online-panel').style.display = 'block';
+            onlineGame.init();
+        });
         
-        function generatePlayerId() {
-            return Math.random().toString(36).substr(2, 9);
-        }
-        
-        // Initialize
-        setupLocalStorageListener();
+        // Start with offline mode by default
+        document.getElementById('offline-btn').click();
     </script>
 </body>
 </html>
