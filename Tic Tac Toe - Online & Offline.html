@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe - Online & Offline</title>
+    <title>Tic Tac Toe - Real Multiplayer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,39 +12,15 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
-        
         h1 {
             text-align: center;
             color: #333;
         }
-        
-        .mode-selector {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        
-        .mode-btn {
-            padding: 10px 20px;
-            margin: 0 10px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        
-        .mode-btn:hover {
-            background-color: #45a049;
-        }
-        
         .game-container {
-            display: none;
+            display: flex;
             flex-direction: column;
             align-items: center;
         }
-        
         .board {
             display: grid;
             grid-template-columns: repeat(3, 100px);
@@ -52,7 +28,6 @@
             gap: 5px;
             margin: 20px 0;
         }
-        
         .cell {
             width: 100px;
             height: 100px;
@@ -65,31 +40,28 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
         .cell:hover {
             background-color: #f0f0f0;
         }
-        
         .status {
             font-size: 20px;
             margin-bottom: 20px;
             font-weight: bold;
+            text-align: center;
+            min-height: 60px;
         }
-        
         .online-controls {
-            display: none;
+            display: flex;
             flex-direction: column;
             width: 100%;
             max-width: 400px;
             margin-bottom: 20px;
         }
-        
         .online-controls input, .online-controls button {
             margin: 5px 0;
             padding: 10px;
             font-size: 16px;
         }
-        
         .online-controls button {
             background-color: #2196F3;
             color: white;
@@ -97,18 +69,15 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        
         .online-controls button:hover {
             background-color: #0b7dda;
         }
-        
         .team-info {
             margin-top: 10px;
             padding: 10px;
             background-color: #e9e9e9;
             border-radius: 5px;
         }
-        
         .reset-btn {
             padding: 10px 20px;
             font-size: 16px;
@@ -117,38 +86,47 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 10px;
         }
-        
         .reset-btn:hover {
             background-color: #d32f2f;
+        }
+        .highlight {
+            background-color: #a5d6a7 !important;
+        }
+        .disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .waiting-message {
+            text-align: center;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
-    <h1>Tic Tac Toe</h1>
-    
-    <div class="mode-selector">
-        <button class="mode-btn" id="offline-btn">Play Offline</button>
-        <button class="mode-btn" id="online-btn">Play Online</button>
-    </div>
+    <h1>Tic Tac Toe - Real Multiplayer</h1>
     
     <div class="game-container" id="game-container">
-        <div class="status" id="status">Player X's turn</div>
-        
         <div class="online-controls" id="online-controls">
-            <input type="text" id="team-name" placeholder="Enter team name">
-            <button id="create-team-btn">Create Team</button>
-            <input type="text" id="join-code" placeholder="Enter team code">
-            <button id="join-team-btn">Join Team</button>
+            <div id="create-section">
+                <input type="text" id="team-name" placeholder="Enter game name" value="My Game">
+                <button id="create-team-btn">Create Game</button>
+            </div>
+            <div id="join-section">
+                <input type="text" id="join-code" placeholder="Enter game code">
+                <button id="join-team-btn">Join Game</button>
+            </div>
             <div class="team-info" id="team-info" style="display: none;">
-                <p>Team: <span id="display-team-name"></span></p>
+                <p>Game: <span id="display-team-name"></span></p>
                 <p>Code: <span id="display-team-code"></span></p>
-                <p>Members: <span id="team-members">1</span></p>
                 <p>Status: <span id="team-status">Waiting for opponent...</span></p>
             </div>
         </div>
         
-        <div class="board" id="board">
+        <div class="status" id="status"></div>
+        
+        <div class="board" id="board" style="display: none;">
             <div class="cell" data-index="0"></div>
             <div class="cell" data-index="1"></div>
             <div class="cell" data-index="2"></div>
@@ -160,7 +138,7 @@
             <div class="cell" data-index="8"></div>
         </div>
         
-        <button class="reset-btn" id="reset-btn">Reset Game</button>
+        <button class="reset-btn" id="reset-btn" style="display: none;">Play Again</button>
     </div>
     
     <script>
@@ -168,16 +146,16 @@
         let currentPlayer = 'X';
         let gameBoard = ['', '', '', '', '', '', '', '', ''];
         let gameActive = false;
-        let isOnlineMode = false;
-        let isTeamLeader = false;
-        let teamCode = '';
+        let mySymbol = '';
+        let gameId = '';
+        let playerId = '';
         let teamName = '';
-        let teamMembers = 1;
-        let socket = null;
+        
+        // Simulated WebSocket using localStorage
+        const CHANNEL = 'tic_tac_toe_multiplayer';
+        let isHost = false;
         
         // DOM elements
-        const offlineBtn = document.getElementById('offline-btn');
-        const onlineBtn = document.getElementById('online-btn');
         const gameContainer = document.getElementById('game-container');
         const statusDisplay = document.getElementById('status');
         const board = document.getElementById('board');
@@ -189,16 +167,142 @@
         const teamInfo = document.getElementById('team-info');
         const displayTeamName = document.getElementById('display-team-name');
         const displayTeamCode = document.getElementById('display-team-code');
-        const teamMembersDisplay = document.getElementById('team-members');
         const teamStatusDisplay = document.getElementById('team-status');
         const resetBtn = document.getElementById('reset-btn');
+        const createSection = document.getElementById('create-section');
+        const joinSection = document.getElementById('join-section');
+        
+        // Initialize simulated WebSocket
+        function setupLocalStorageListener() {
+            window.addEventListener('storage', (event) => {
+                if (event.key === CHANNEL && event.newValue) {
+                    const data = JSON.parse(event.newValue);
+                    if (data.gameId === gameId) {
+                        handleMessage(data);
+                    }
+                }
+            });
+        }
+        
+        function sendMessage(data) {
+            localStorage.setItem(CHANNEL, JSON.stringify(data));
+            localStorage.removeItem(CHANNEL); // Trigger event
+        }
+        
+        // Handle incoming messages
+        function handleMessage(data) {
+            switch (data.type) {
+                case 'game_created':
+                    handleGameCreated(data);
+                    break;
+                case 'player_joined':
+                    handlePlayerJoined(data);
+                    break;
+                case 'move':
+                    handleMoveReceived(data);
+                    break;
+                case 'restart':
+                    handleRestartReceived(data);
+                    break;
+                case 'player_left':
+                    handlePlayerLeft();
+                    break;
+            }
+        }
+        
+        function handleGameCreated(data) {
+            gameId = data.gameId;
+            playerId = data.playerId;
+            mySymbol = 'X';
+            teamName = data.teamName;
+            isHost = true;
+            
+            displayTeamName.textContent = teamName;
+            displayTeamCode.textContent = gameId;
+            teamStatusDisplay.textContent = 'Waiting for opponent...';
+            
+            teamInfo.style.display = 'block';
+            createSection.style.display = 'none';
+            statusDisplay.textContent = 'Waiting for an opponent to join...';
+        }
+        
+        function handlePlayerJoined(data) {
+            gameId = data.gameId;
+            playerId = data.playerId;
+            mySymbol = 'O';
+            teamName = data.teamName;
+            isHost = false;
+            
+            displayTeamName.textContent = teamName;
+            displayTeamCode.textContent = gameId;
+            teamStatusDisplay.textContent = 'Game ready!';
+            
+            teamInfo.style.display = 'block';
+            joinSection.style.display = 'none';
+            board.style.display = 'grid';
+            
+            gameActive = true;
+            currentPlayer = 'X';
+            
+            updateStatus();
+            
+            // Notify host that we joined
+            sendMessage({
+                type: 'player_joined_ack',
+                gameId,
+                playerId,
+                teamName
+            });
+        }
+        
+        function handleMoveReceived(data) {
+            // Update game board
+            gameBoard = data.board;
+            updateBoard();
+            
+            // Update game state
+            currentPlayer = data.currentPlayer;
+            
+            if (data.status === 'finished') {
+                gameActive = false;
+                if (data.winner === 'draw') {
+                    statusDisplay.textContent = 'Game ended in a draw!';
+                } else if (data.winner === mySymbol) {
+                    statusDisplay.textContent = 'You won!';
+                } else {
+                    statusDisplay.textContent = 'You lost!';
+                }
+                resetBtn.style.display = 'block';
+                highlightWinningCells(data.board);
+            } else {
+                updateStatus();
+            }
+        }
+        
+        function handleRestartReceived(data) {
+            gameBoard = data.board;
+            currentPlayer = data.currentPlayer;
+            gameActive = true;
+            
+            updateBoard();
+            updateStatus();
+            resetBtn.style.display = 'none';
+            
+            // Remove highlights
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.classList.remove('highlight');
+            });
+        }
+        
+        function handlePlayerLeft() {
+            gameActive = false;
+            statusDisplay.textContent = 'Opponent disconnected. Waiting for them to reconnect...';
+        }
         
         // Event listeners
-        offlineBtn.addEventListener('click', startOfflineGame);
-        onlineBtn.addEventListener('click', startOnlineGame);
-        createTeamBtn.addEventListener('click', createTeam);
-        joinTeamBtn.addEventListener('click', joinTeam);
-        resetBtn.addEventListener('click', resetGame);
+        createTeamBtn.addEventListener('click', createGame);
+        joinTeamBtn.addEventListener('click', joinGame);
+        resetBtn.addEventListener('click', requestRestart);
         
         // Initialize cells
         document.querySelectorAll('.cell').forEach(cell => {
@@ -206,189 +310,123 @@
         });
         
         // Game functions
-        function startOfflineGame() {
-            isOnlineMode = false;
-            gameContainer.style.display = 'flex';
-            onlineControls.style.display = 'none';
-            teamInfo.style.display = 'none';
-            resetGame();
-        }
-        
-        function startOnlineGame() {
-            isOnlineMode = true;
-            gameContainer.style.display = 'flex';
-            onlineControls.style.display = 'flex';
-            teamInfo.style.display = 'none';
-            resetGame();
-            
-            // In a real app, you would connect to a WebSocket server here
-            // For this demo, we'll simulate online functionality locally
-            console.log("Simulating online mode - in a real app, WebSocket connection would be established here");
-        }
-        
-        function createTeam() {
+        function createGame() {
             const name = teamNameInput.value.trim();
             if (!name) {
-                alert('Please enter a team name');
+                alert('Please enter a game name');
                 return;
             }
             
-            // In a real app, this would generate a unique code on the server
-            teamCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            gameId = generateGameCode();
+            playerId = generatePlayerId();
             teamName = name;
-            isTeamLeader = true;
             
-            displayTeamName.textContent = teamName;
-            displayTeamCode.textContent = teamCode;
-            teamMembers = 1;
-            teamMembersDisplay.textContent = teamMembers;
-            teamStatusDisplay.textContent = 'Waiting for opponent...';
+            sendMessage({
+                type: 'game_created',
+                gameId,
+                playerId,
+                teamName: name
+            });
             
-            teamInfo.style.display = 'block';
-            gameActive = false;
-            
-            console.log(`Team created: ${teamName} (Code: ${teamCode})`);
+            // Handle our own message (since storage event won't fire for same tab)
+            handleGameCreated({
+                gameId,
+                playerId,
+                teamName: name
+            });
         }
         
-        function joinTeam() {
-            const code = joinCodeInput.value.trim();
+        function joinGame() {
+            const code = joinCodeInput.value.trim().toUpperCase();
             if (!code) {
-                alert('Please enter a team code');
+                alert('Please enter a game code');
                 return;
             }
             
-            // In a real app, this would verify the code with the server
-            teamCode = code;
-            isTeamLeader = false;
+            playerId = generatePlayerId();
+            gameId = code;
             
-            // Simulate joining a team
-            teamName = `Team ${Math.floor(Math.random() * 100)}`;
-            displayTeamName.textContent = teamName;
-            displayTeamCode.textContent = teamCode;
-            teamMembers = 2; // Simulating that we've joined an existing team
-            teamMembersDisplay.textContent = teamMembers;
-            teamStatusDisplay.textContent = 'Game ready!';
+            sendMessage({
+                type: 'player_joined',
+                gameId,
+                playerId
+            });
             
-            teamInfo.style.display = 'block';
-            gameActive = true;
-            currentPlayer = 'O'; // Second player is O
-            
-            console.log(`Joined team: ${teamName} (Code: ${teamCode})`);
-            
-            // In a real app, the server would notify the team leader
-            statusDisplay.textContent = "Player X's turn";
+            // Handle our own message
+            handlePlayerJoined({
+                gameId,
+                playerId,
+                teamName: 'Game ' + code // Default name
+            });
         }
         
         function handleCellClick(e) {
             if (!gameActive) return;
+            if (currentPlayer !== mySymbol) return;
             
             const cell = e.target;
             const cellIndex = parseInt(cell.getAttribute('data-index'));
             
             if (gameBoard[cellIndex] !== '') return;
             
-            // In online mode, only allow moves when it's your turn
-            if (isOnlineMode) {
-                if ((isTeamLeader && currentPlayer !== 'X') || (!isTeamLeader && currentPlayer !== 'O')) {
-                    return;
-                }
-            }
+            // Make move
+            gameBoard[cellIndex] = mySymbol;
+            cell.textContent = mySymbol;
             
-            gameBoard[cellIndex] = currentPlayer;
-            cell.textContent = currentPlayer;
+            // Check for winner
+            const winner = checkWinner(gameBoard);
+            const isDraw = checkDraw(gameBoard);
             
-            // In a real online game, you would send the move to the server here
-            if (isOnlineMode) {
-                console.log(`Sending move to server: ${cellIndex}`);
-                // Simulate network delay
-                setTimeout(() => {
-                    const gameWon = checkWin();
-                    const gameDraw = checkDraw();
-                    
-                    if (gameWon || gameDraw) {
-                        gameActive = false;
-                        return;
-                    }
-                    
-                    changePlayer();
-                }, 500);
+            sendMessage({
+                type: 'move',
+                gameId,
+                index: cellIndex,
+                symbol: mySymbol,
+                board: gameBoard,
+                currentPlayer: mySymbol === 'X' ? 'O' : 'X',
+                status: winner || isDraw ? 'finished' : 'active',
+                winner: winner || (isDraw ? 'draw' : null)
+            });
+            
+            // Handle our own message
+            handleMoveReceived({
+                board: gameBoard,
+                currentPlayer: mySymbol === 'X' ? 'O' : 'X',
+                status: winner || isDraw ? 'finished' : 'active',
+                winner: winner || (isDraw ? 'draw' : null)
+            });
+        }
+        
+        function requestRestart() {
+            sendMessage({
+                type: 'restart',
+                gameId,
+                board: ['', '', '', '', '', '', '', '', ''],
+                currentPlayer: 'X'
+            });
+            
+            // Handle our own message
+            handleRestartReceived({
+                board: ['', '', '', '', '', '', '', '', ''],
+                currentPlayer: 'X'
+            });
+        }
+        
+        function updateBoard() {
+            document.querySelectorAll('.cell').forEach((cell, index) => {
+                cell.textContent = gameBoard[index];
+            });
+        }
+        
+        function updateStatus() {
+            if (currentPlayer === mySymbol) {
+                statusDisplay.textContent = 'Your turn (' + mySymbol + ')';
             } else {
-                const gameWon = checkWin();
-                const gameDraw = checkDraw();
-                
-                if (gameWon || gameDraw) {
-                    gameActive = false;
-                    return;
-                }
-                
-                changePlayer();
-                
-                // Computer move in offline mode
-                if (!isOnlineMode && currentPlayer === 'O') {
-                    setTimeout(makeComputerMove, 500);
-                }
+                statusDisplay.textContent = 'Waiting for opponent...';
             }
         }
         
-        function makeComputerMove() {
-            if (!gameActive) return;
-            
-            // Simple AI - first try to win, then block, then random
-            let move = findWinningMove('O') || findWinningMove('X') || findRandomMove();
-            
-            if (move !== null) {
-                gameBoard[move] = 'O';
-                document.querySelector(`.cell[data-index="${move}"]`).textContent = 'O';
-                
-                const gameWon = checkWin();
-                const gameDraw = checkDraw();
-                
-                if (gameWon || gameDraw) {
-                    gameActive = false;
-                    return;
-                }
-                
-                changePlayer();
-            }
-        }
-        
-        function findWinningMove(player) {
-            // Check rows
-            for (let i = 0; i < 9; i += 3) {
-                const row = [gameBoard[i], gameBoard[i+1], gameBoard[i+2]];
-                if (row.filter(c => c === player).length === 2 && row.includes('')) {
-                    return i + row.indexOf('');
-                }
-            }
-            
-            // Check columns
-            for (let i = 0; i < 3; i++) {
-                const col = [gameBoard[i], gameBoard[i+3], gameBoard[i+6]];
-                if (col.filter(c => c === player).length === 2 && col.includes('')) {
-                    return i + (col.indexOf('') * 3);
-                }
-            }
-            
-            // Check diagonals
-            const diag1 = [gameBoard[0], gameBoard[4], gameBoard[8]];
-            if (diag1.filter(c => c === player).length === 2 && diag1.includes('')) {
-                return diag1.indexOf('') * 4;
-            }
-            
-            const diag2 = [gameBoard[2], gameBoard[4], gameBoard[6]];
-            if (diag2.filter(c => c === player).length === 2 && diag2.includes('')) {
-                return 2 + (diag2.indexOf('') * 2);
-            }
-            
-            return null;
-        }
-        
-        function findRandomMove() {
-            const availableMoves = gameBoard.map((cell, index) => cell === '' ? index : null).filter(val => val !== null);
-            return availableMoves.length > 0 ? availableMoves[Math.floor(Math.random() * availableMoves.length)] : null;
-        }
-        
-        function checkWin() {
+        function highlightWinningCells(board) {
             const winPatterns = [
                 [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
                 [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
@@ -397,57 +435,51 @@
             
             for (const pattern of winPatterns) {
                 const [a, b, c] = pattern;
-                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
-                    statusDisplay.textContent = `Player ${gameBoard[a]} wins!`;
-                    highlightWinningCells(pattern);
-                    return true;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    document.querySelector(`.cell[data-index="${a}"]`).classList.add('highlight');
+                    document.querySelector(`.cell[data-index="${b}"]`).classList.add('highlight');
+                    document.querySelector(`.cell[data-index="${c}"]`).classList.add('highlight');
+                    return;
+                }
+            }
+        }
+        
+        function checkWinner(board) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6]             // diagonals
+            ];
+            
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return board[a];
                 }
             }
             
-            return false;
+            return null;
         }
         
-        function highlightWinningCells(cells) {
-            cells.forEach(index => {
-                document.querySelector(`.cell[data-index="${index}"]`).style.backgroundColor = '#a5d6a7';
-            });
+        function checkDraw(board) {
+            return board.every(cell => cell !== '');
         }
         
-        function checkDraw() {
-            if (!gameBoard.includes('')) {
-                statusDisplay.textContent = "Game ended in a draw!";
-                return true;
+        function generateGameCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-            return false;
+            return result;
         }
         
-        function changePlayer() {
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+        function generatePlayerId() {
+            return Math.random().toString(36).substr(2, 9);
         }
         
-        function resetGame() {
-            currentPlayer = 'X';
-            gameBoard = ['', '', '', '', '', '', '', '', ''];
-            gameActive = true;
-            
-            statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
-            
-            document.querySelectorAll('.cell').forEach(cell => {
-                cell.textContent = '';
-                cell.style.backgroundColor = 'white';
-            });
-            
-            if (isOnlineMode && teamInfo.style.display === 'block' && teamMembers >= 2) {
-                gameActive = true;
-                currentPlayer = isTeamLeader ? 'X' : 'O';
-                statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
-            } else if (!isOnlineMode) {
-                gameActive = true;
-            } else {
-                gameActive = false;
-            }
-        }
+        // Initialize
+        setupLocalStorageListener();
     </script>
 </body>
 </html>
