@@ -3,1436 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe - Team Play</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Tic Tac Toe - Online & Offline</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
-        }
-        
-        .container {
-            max-width: 1000px;
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            position: relative;
+            background-color: #f5f5f5;
         }
         
         h1 {
-            color: #fff;
-            font-size: 2.8rem;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(to right, #ff5252, #4fc3f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            flex-grow: 1;
             text-align: center;
+            color: #333;
         }
         
-        .tabs {
-            display: flex;
-            margin-bottom: 25px;
-            border-radius: 50px;
-            background: rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .tab.active {
-            background: linear-gradient(45deg, #6a11cb, #2575fc);
-            color: white;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .game-settings {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 25px;
-            padding: 20px;
-            border-radius: 15px;
-            background-color: rgba(0, 0, 0, 0.2);
-            color: white;
-        }
-        
-        .settings-row {
+        .mode-selector {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .player-input {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .player-input label {
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        
-        .player-input input {
-            padding: 10px 15px;
-            border-radius: 50px;
-            border: none;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            font-size: 1rem;
-            text-align: center;
-            max-width: 150px;
-        }
-        
-        .player-input input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-            padding: 15px;
-            border-radius: 10px;
-            background-color: rgba(0, 0, 0, 0.2);
-            color: white;
-        }
-        
-        .player-turn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        .player-turn.x { color: #ff5252; }
-        .player-turn.o { color: #4fc3f7; }
-        
-        .player-icon {
-            font-size: 1.8rem;
-        }
-        
-        .scoreboard {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .score {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .score-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-        
-        .score-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-        
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-gap: 15px;
-            margin: 0 auto 30px;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-        }
-        
-        .cell {
-            aspect-ratio: 1/1;
-            background-color: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 4.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .cell:hover {
-            background-color: rgba(255, 255, 255, 0.25);
-            transform: translateY(-3px);
-        }
-        
-        .cell.x {
-            color: #ff5252;
-        }
-        
-        .cell.o {
-            color: #4fc3f7;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        button {
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        }
-        
-        button:active {
-            transform: translateY(1px);
+            margin-bottom: 20px;
         }
         
         .mode-btn {
-            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        
+        .mode-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .game-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px 0;
+        }
+        
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .cell:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .status {
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .online-controls {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .online-controls input, .online-controls button {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        
+        .online-controls button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .online-controls button:hover {
+            background-color: #0b7dda;
+        }
+        
+        .team-info {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e9e9e9;
+            border-radius: 5px;
         }
         
         .reset-btn {
-            background: linear-gradient(45deg, #ff5252, #ff7675);
-        }
-        
-        .new-game-btn {
-            background: linear-gradient(45deg, #4fc3f7, #29b6f6);
-        }
-        
-        .message {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-        
-        .message.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        .message-content {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 90%;
-            width: 400px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-        
-        .message h2 {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #f44336;
             color: white;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-        
-        .message p {
-            color: white;
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-        }
-        
-        .winning-cell {
-            animation: pulse 1s infinite;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .difficulty {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .difficulty-btn {
-            padding: 8px 15px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-        
-        .difficulty-btn.active {
-            background: linear-gradient(45deg, #4fc3f7, #29b6f6);
-            box-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
-        }
-        
-        .sound-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.15);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            color: white;
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .sound-toggle:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: scale(1.1);
-        }
-        
-        /* Team Section */
-        .team-section {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            color: white;
-        }
-        
-        .team-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .team-controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-        
-        .team-btn {
-            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
-        }
-        
-        .team-btn.join {
-            background: linear-gradient(45deg, #a1c4fd, #c2e9fb);
-        }
-        
-        .team-btn.invite {
-            background: linear-gradient(45deg, #ffecd2, #fcb69f);
-        }
-        
-        .teams-container {
-            display: flex;
-            justify-content: space-around;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .team {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 15px;
-            flex: 1;
-            min-height: 200px;
-        }
-        
-        .team h3 {
-            margin-bottom: 15px;
-            color: #ff5252;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding-bottom: 10px;
-        }
-        
-        .team.o h3 {
-            color: #4fc3f7;
-        }
-        
-        .team-members {
-            list-style: none;
-        }
-        
-        .team-members li {
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .team-members li:last-child {
-            border-bottom: none;
-        }
-        
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #ccc;
-        }
-        
-        .status-indicator.online {
-            background: #4caf50;
-        }
-        
-        .status-indicator.playing {
-            background: #ff9800;
-        }
-        
-        .invite-section {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        
-        .invite-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .invite-link {
-            flex: 1;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            word-break: break-all;
-            font-size: 0.9rem;
-        }
-        
-        .copy-btn {
-            padding: 10px 15px;
-            background: linear-gradient(45deg, #6a11cb, #2575fc);
             border: none;
-            border-radius: 10px;
-            color: white;
+            border-radius: 5px;
             cursor: pointer;
         }
         
-        .chat-container {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        
-        .chat-messages {
-            height: 200px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .chat-input {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .chat-input input {
-            flex: 1;
-            padding: 10px 15px;
-            border-radius: 50px;
-            border: none;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-        }
-        
-        .chat-message {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 15px;
-            max-width: 80%;
-            align-self: flex-start;
-        }
-        
-        .chat-message.me {
-            background: linear-gradient(45deg, #6a11cb, #2575fc);
-            align-self: flex-end;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            header {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .game-info {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .player-turn {
-                justify-content: center;
-            }
-            
-            .game-board {
-                max-width: 350px;
-                grid-gap: 10px;
-                padding: 15px;
-            }
-            
-            .cell {
-                font-size: 3.5rem;
-            }
-            
-            .message-content {
-                width: 90%;
-                padding: 30px 20px;
-            }
-            
-            .message h2 {
-                font-size: 2rem;
-            }
-            
-            .message p {
-                font-size: 1.3rem;
-            }
-            
-            .teams-container {
-                flex-direction: column;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .game-board {
-                max-width: 300px;
-            }
-            
-            .cell {
-                font-size: 3rem;
-            }
-            
-            .player-turn {
-                font-size: 1.3rem;
-            }
-            
-            .player-icon {
-                font-size: 1.5rem;
-            }
-            
-            .score-value {
-                font-size: 1.5rem;
-            }
-            
-            button {
-                padding: 10px 20px;
-                font-size: 1rem;
-            }
-            
-            .tab {
-                padding: 10px;
-                font-size: 0.9rem;
-            }
+        .reset-btn:hover {
+            background-color: #d32f2f;
         }
     </style>
 </head>
 <body>
-    <div class="sound-toggle" id="sound-toggle">
-        <i class="fas fa-volume-up"></i>
+    <h1>Tic Tac Toe</h1>
+    
+    <div class="mode-selector">
+        <button class="mode-btn" id="offline-btn">Play Offline</button>
+        <button class="mode-btn" id="online-btn">Play Online</button>
     </div>
     
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-times"></i> TIC TAC TOE TEAMS <i class="far fa-circle"></i></h1>
-            <div class="difficulty">
-                <div class="difficulty-btn active" data-difficulty="easy">Easy</div>
-                <div class="difficulty-btn" data-difficulty="medium">Medium</div>
-                <div class="difficulty-btn" data-difficulty="hard">Hard</div>
-            </div>
-        </header>
+    <div class="game-container" id="game-container">
+        <div class="status" id="status">Player X's turn</div>
         
-        <div class="tabs">
-            <div class="tab active" data-tab="single">Single Player</div>
-            <div class="tab" data-tab="team">Team Play</div>
-        </div>
-        
-        <!-- Single Player Tab -->
-        <div class="tab-content active" id="single-player-tab">
-            <div class="game-settings">
-                <div class="settings-row">
-                    <div class="player-input">
-                        <label for="player-x">Player X</label>
-                        <input type="text" id="player-x" placeholder="Player X" value="Player X">
-                    </div>
-                    <div class="player-input">
-                        <label for="player-o">Player O</label>
-                        <input type="text" id="player-o" placeholder="Player O" value="Player O">
-                    </div>
-                </div>
-            </div>
-            
-            <div class="game-info">
-                <div class="player-turn">
-                    <i class="fas fa-times player-icon"></i>
-                    <span>Player X's Turn</span>
-                </div>
-                <div class="scoreboard">
-                    <div class="score">
-                        <div class="score-value" id="score-x">0</div>
-                        <div class="score-label">Player X</div>
-                    </div>
-                    <div class="score">
-                        <div class="score-value" id="score-o">0</div>
-                        <div class="score-label">Player O</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="game-board" id="game-board">
-                <div class="cell" data-index="0"></div>
-                <div class="cell" data-index="1"></div>
-                <div class="cell" data-index="2"></div>
-                <div class="cell" data-index="3"></div>
-                <div class="cell" data-index="4"></div>
-                <div class="cell" data-index="5"></div>
-                <div class="cell" data-index="6"></div>
-                <div class="cell" data-index="7"></div>
-                <div class="cell" data-index="8"></div>
-            </div>
-            
-            <div class="controls">
-                <button class="mode-btn" id="mode-btn">
-                    <i class="fas fa-robot"></i> AI Mode: On
-                </button>
-                <button class="reset-btn" id="reset-btn">
-                    <i class="fas fa-sync-alt"></i> Reset Game
-                </button>
-                <button class="new-game-btn" id="new-game-btn">
-                    <i class="fas fa-plus-circle"></i> New Game
-                </button>
+        <div class="online-controls" id="online-controls">
+            <input type="text" id="team-name" placeholder="Enter team name">
+            <button id="create-team-btn">Create Team</button>
+            <input type="text" id="join-code" placeholder="Enter team code">
+            <button id="join-team-btn">Join Team</button>
+            <div class="team-info" id="team-info" style="display: none;">
+                <p>Team: <span id="display-team-name"></span></p>
+                <p>Code: <span id="display-team-code"></span></p>
+                <p>Members: <span id="team-members">1</span></p>
+                <p>Status: <span id="team-status">Waiting for opponent...</span></p>
             </div>
         </div>
         
-        <!-- Team Play Tab -->
-        <div class="tab-content" id="team-tab">
-            <div class="team-section">
-                <div class="team-header">
-                    <h2>Team Play</h2>
-                    <div class="player-turn">
-                        <i class="fas fa-times player-icon"></i>
-                        <span>Team X's Turn</span>
-                    </div>
-                </div>
-                
-                <div class="team-controls">
-                    <button class="team-btn" id="create-team-btn">
-                        <i class="fas fa-users"></i> Create Team
-                    </button>
-                    <button class="team-btn join" id="join-team-btn">
-                        <i class="fas fa-user-plus"></i> Join Team
-                    </button>
-                    <button class="team-btn invite" id="invite-btn">
-                        <i class="fas fa-share-alt"></i> Invite Players
-                    </button>
-                </div>
-                
-                <div class="teams-container">
-                    <div class="team x">
-                        <h3>Team X</h3>
-                        <ul class="team-members" id="team-x-members">
-                            <li>
-                                <span class="status-indicator online"></span>
-                                Player X (You)
-                            </li>
-                            <li>
-                                <span class="status-indicator online"></span>
-                                Player X2
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <div class="team o">
-                        <h3>Team O</h3>
-                        <ul class="team-members" id="team-o-members">
-                            <li>
-                                <span class="status-indicator online"></span>
-                                Player O1
-                            </li>
-                            <li>
-                                <span class="status-indicator online"></span>
-                                Player O2
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="game-info">
-                    <div class="scoreboard">
-                        <div class="score">
-                            <div class="score-value" id="team-score-x">0</div>
-                            <div class="score-label">Team X</div>
-                        </div>
-                        <div class="score">
-                            <div class="score-value" id="team-score-o">0</div>
-                            <div class="score-label">Team O</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="game-board" id="team-game-board">
-                    <div class="cell" data-index="0"></div>
-                    <div class="cell" data-index="1"></div>
-                    <div class="cell" data-index="2"></div>
-                    <div class="cell" data-index="3"></div>
-                    <div class="cell" data-index="4"></div>
-                    <div class="cell" data-index="5"></div>
-                    <div class="cell" data-index="6"></div>
-                    <div class="cell" data-index="7"></div>
-                    <div class="cell" data-index="8"></div>
-                </div>
-                
-                <div class="controls">
-                    <button class="reset-btn" id="team-reset-btn">
-                        <i class="fas fa-sync-alt"></i> Reset Game
-                    </button>
-                    <button class="new-game-btn" id="team-new-game-btn">
-                        <i class="fas fa-plus-circle"></i> New Game
-                    </button>
-                </div>
-                
-                <div class="invite-section">
-                    <h3>Invite Players to Your Team</h3>
-                    <p>Share this link with your friends to invite them to your team:</p>
-                    <div class="invite-controls">
-                        <div class="invite-link" id="invite-link">https://tictactoe.com/join?team=X&room=ABC123</div>
-                        <button class="copy-btn" id="copy-btn">Copy</button>
-                    </div>
-                </div>
-                
-                <div class="chat-container">
-                    <h3>Team Chat</h3>
-                    <div class="chat-messages" id="chat-messages">
-                        <div class="chat-message">Welcome to the team chat!</div>
-                        <div class="chat-message">Player X2: Let's win this game!</div>
-                        <div class="chat-message me">You: I'll take the center position</div>
-                    </div>
-                    <div class="chat-input">
-                        <input type="text" id="chat-input" placeholder="Type your message...">
-                        <button class="copy-btn" id="send-btn">Send</button>
-                    </div>
-                </div>
-            </div>
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
         </div>
-    </div>
-    
-    <div class="message" id="message">
-        <div class="message-content">
-            <h2>Game Over!</h2>
-            <p id="result-text">X Wins!</p>
-            <button class="new-game-btn" id="play-again-btn">
-                <i class="fas fa-redo"></i> Play Again
-            </button>
-        </div>
+        
+        <button class="reset-btn" id="reset-btn">Reset Game</button>
     </div>
     
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Game state
-            let currentPlayer = 'X';
-            let gameBoard = ['', '', '', '', '', '', '', '', ''];
-            let gameActive = true;
-            let scores = { X: 0, O: 0 };
-            let teamScores = { X: 0, O: 0 };
-            let aiMode = true;
-            let difficulty = 'easy';
-            let soundEnabled = true;
-            let currentTab = 'single';
+        // Game state
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = false;
+        let isOnlineMode = false;
+        let isTeamLeader = false;
+        let teamCode = '';
+        let teamName = '';
+        let teamMembers = 1;
+        let socket = null;
+        
+        // DOM elements
+        const offlineBtn = document.getElementById('offline-btn');
+        const onlineBtn = document.getElementById('online-btn');
+        const gameContainer = document.getElementById('game-container');
+        const statusDisplay = document.getElementById('status');
+        const board = document.getElementById('board');
+        const onlineControls = document.getElementById('online-controls');
+        const createTeamBtn = document.getElementById('create-team-btn');
+        const joinTeamBtn = document.getElementById('join-team-btn');
+        const teamNameInput = document.getElementById('team-name');
+        const joinCodeInput = document.getElementById('join-code');
+        const teamInfo = document.getElementById('team-info');
+        const displayTeamName = document.getElementById('display-team-name');
+        const displayTeamCode = document.getElementById('display-team-code');
+        const teamMembersDisplay = document.getElementById('team-members');
+        const teamStatusDisplay = document.getElementById('team-status');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        // Event listeners
+        offlineBtn.addEventListener('click', startOfflineGame);
+        onlineBtn.addEventListener('click', startOnlineGame);
+        createTeamBtn.addEventListener('click', createTeam);
+        joinTeamBtn.addEventListener('click', joinTeam);
+        resetBtn.addEventListener('click', resetGame);
+        
+        // Initialize cells
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.addEventListener('click', handleCellClick);
+        });
+        
+        // Game functions
+        function startOfflineGame() {
+            isOnlineMode = false;
+            gameContainer.style.display = 'flex';
+            onlineControls.style.display = 'none';
+            teamInfo.style.display = 'none';
+            resetGame();
+        }
+        
+        function startOnlineGame() {
+            isOnlineMode = true;
+            gameContainer.style.display = 'flex';
+            onlineControls.style.display = 'flex';
+            teamInfo.style.display = 'none';
+            resetGame();
             
-            // Player names
-            let playerNames = {
-                X: 'Player X',
-                O: 'Player O'
-            };
+            // In a real app, you would connect to a WebSocket server here
+            // For this demo, we'll simulate online functionality locally
+            console.log("Simulating online mode - in a real app, WebSocket connection would be established here");
+        }
+        
+        function createTeam() {
+            const name = teamNameInput.value.trim();
+            if (!name) {
+                alert('Please enter a team name');
+                return;
+            }
             
-            // Team members
-            let teamMembers = {
-                X: ['Player X (You)', 'Player X2'],
-                O: ['Player O1', 'Player O2']
-            };
+            // In a real app, this would generate a unique code on the server
+            teamCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            teamName = name;
+            isTeamLeader = true;
             
-            // DOM elements
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            const cells = document.querySelectorAll('.cell');
-            const teamCells = document.querySelectorAll('#team-game-board .cell');
-            const playerTurnElement = document.querySelector('.player-turn');
-            const playerIconElement = document.querySelector('.player-icon');
-            const scoreXElement = document.getElementById('score-x');
-            const scoreOElement = document.getElementById('score-o');
-            const teamScoreXElement = document.getElementById('team-score-x');
-            const teamScoreOElement = document.getElementById('team-score-o');
-            const resetBtn = document.getElementById('reset-btn');
-            const newGameBtn = document.getElementById('new-game-btn');
-            const teamResetBtn = document.getElementById('team-reset-btn');
-            const teamNewGameBtn = document.getElementById('team-new-game-btn');
-            const modeBtn = document.getElementById('mode-btn');
-            const messageElement = document.getElementById('message');
-            const resultTextElement = document.getElementById('result-text');
-            const playAgainBtn = document.getElementById('play-again-btn');
-            const soundToggle = document.getElementById('sound-toggle');
-            const playerXInput = document.getElementById('player-x');
-            const playerOInput = document.getElementById('player-o');
-            const difficultyBtns = document.querySelectorAll('.difficulty-btn');
-            const createTeamBtn = document.getElementById('create-team-btn');
-            const joinTeamBtn = document.getElementById('join-team-btn');
-            const inviteBtn = document.getElementById('invite-btn');
-            const copyBtn = document.getElementById('copy-btn');
-            const inviteLink = document.getElementById('invite-link');
-            const chatInput = document.getElementById('chat-input');
-            const sendBtn = document.getElementById('send-btn');
-            const chatMessages = document.getElementById('chat-messages');
+            displayTeamName.textContent = teamName;
+            displayTeamCode.textContent = teamCode;
+            teamMembers = 1;
+            teamMembersDisplay.textContent = teamMembers;
+            teamStatusDisplay.textContent = 'Waiting for opponent...';
             
-            // Winning combinations
+            teamInfo.style.display = 'block';
+            gameActive = false;
+            
+            console.log(`Team created: ${teamName} (Code: ${teamCode})`);
+        }
+        
+        function joinTeam() {
+            const code = joinCodeInput.value.trim();
+            if (!code) {
+                alert('Please enter a team code');
+                return;
+            }
+            
+            // In a real app, this would verify the code with the server
+            teamCode = code;
+            isTeamLeader = false;
+            
+            // Simulate joining a team
+            teamName = `Team ${Math.floor(Math.random() * 100)}`;
+            displayTeamName.textContent = teamName;
+            displayTeamCode.textContent = teamCode;
+            teamMembers = 2; // Simulating that we've joined an existing team
+            teamMembersDisplay.textContent = teamMembers;
+            teamStatusDisplay.textContent = 'Game ready!';
+            
+            teamInfo.style.display = 'block';
+            gameActive = true;
+            currentPlayer = 'O'; // Second player is O
+            
+            console.log(`Joined team: ${teamName} (Code: ${teamCode})`);
+            
+            // In a real app, the server would notify the team leader
+            statusDisplay.textContent = "Player X's turn";
+        }
+        
+        function handleCellClick(e) {
+            if (!gameActive) return;
+            
+            const cell = e.target;
+            const cellIndex = parseInt(cell.getAttribute('data-index'));
+            
+            if (gameBoard[cellIndex] !== '') return;
+            
+            // In online mode, only allow moves when it's your turn
+            if (isOnlineMode) {
+                if ((isTeamLeader && currentPlayer !== 'X') || (!isTeamLeader && currentPlayer !== 'O')) {
+                    return;
+                }
+            }
+            
+            gameBoard[cellIndex] = currentPlayer;
+            cell.textContent = currentPlayer;
+            
+            // In a real online game, you would send the move to the server here
+            if (isOnlineMode) {
+                console.log(`Sending move to server: ${cellIndex}`);
+                // Simulate network delay
+                setTimeout(() => {
+                    const gameWon = checkWin();
+                    const gameDraw = checkDraw();
+                    
+                    if (gameWon || gameDraw) {
+                        gameActive = false;
+                        return;
+                    }
+                    
+                    changePlayer();
+                }, 500);
+            } else {
+                const gameWon = checkWin();
+                const gameDraw = checkDraw();
+                
+                if (gameWon || gameDraw) {
+                    gameActive = false;
+                    return;
+                }
+                
+                changePlayer();
+                
+                // Computer move in offline mode
+                if (!isOnlineMode && currentPlayer === 'O') {
+                    setTimeout(makeComputerMove, 500);
+                }
+            }
+        }
+        
+        function makeComputerMove() {
+            if (!gameActive) return;
+            
+            // Simple AI - first try to win, then block, then random
+            let move = findWinningMove('O') || findWinningMove('X') || findRandomMove();
+            
+            if (move !== null) {
+                gameBoard[move] = 'O';
+                document.querySelector(`.cell[data-index="${move}"]`).textContent = 'O';
+                
+                const gameWon = checkWin();
+                const gameDraw = checkDraw();
+                
+                if (gameWon || gameDraw) {
+                    gameActive = false;
+                    return;
+                }
+                
+                changePlayer();
+            }
+        }
+        
+        function findWinningMove(player) {
+            // Check rows
+            for (let i = 0; i < 9; i += 3) {
+                const row = [gameBoard[i], gameBoard[i+1], gameBoard[i+2]];
+                if (row.filter(c => c === player).length === 2 && row.includes('')) {
+                    return i + row.indexOf('');
+                }
+            }
+            
+            // Check columns
+            for (let i = 0; i < 3; i++) {
+                const col = [gameBoard[i], gameBoard[i+3], gameBoard[i+6]];
+                if (col.filter(c => c === player).length === 2 && col.includes('')) {
+                    return i + (col.indexOf('') * 3);
+                }
+            }
+            
+            // Check diagonals
+            const diag1 = [gameBoard[0], gameBoard[4], gameBoard[8]];
+            if (diag1.filter(c => c === player).length === 2 && diag1.includes('')) {
+                return diag1.indexOf('') * 4;
+            }
+            
+            const diag2 = [gameBoard[2], gameBoard[4], gameBoard[6]];
+            if (diag2.filter(c => c === player).length === 2 && diag2.includes('')) {
+                return 2 + (diag2.indexOf('') * 2);
+            }
+            
+            return null;
+        }
+        
+        function findRandomMove() {
+            const availableMoves = gameBoard.map((cell, index) => cell === '' ? index : null).filter(val => val !== null);
+            return availableMoves.length > 0 ? availableMoves[Math.floor(Math.random() * availableMoves.length)] : null;
+        }
+        
+        function checkWin() {
             const winPatterns = [
                 [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
                 [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
                 [0, 4, 8], [2, 4, 6]             // diagonals
             ];
             
-            // Initialize game
-            initGame();
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                    statusDisplay.textContent = `Player ${gameBoard[a]} wins!`;
+                    highlightWinningCells(pattern);
+                    return true;
+                }
+            }
             
-            // Event listeners
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.getAttribute('data-tab');
-                    switchTab(tabId);
-                });
+            return false;
+        }
+        
+        function highlightWinningCells(cells) {
+            cells.forEach(index => {
+                document.querySelector(`.cell[data-index="${index}"]`).style.backgroundColor = '#a5d6a7';
+            });
+        }
+        
+        function checkDraw() {
+            if (!gameBoard.includes('')) {
+                statusDisplay.textContent = "Game ended in a draw!";
+                return true;
+            }
+            return false;
+        }
+        
+        function changePlayer() {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+        }
+        
+        function resetGame() {
+            currentPlayer = 'X';
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            
+            statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+            
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.textContent = '';
+                cell.style.backgroundColor = 'white';
             });
             
-            cells.forEach(cell => {
-                cell.addEventListener('click', handleCellClick);
-            });
-            
-            teamCells.forEach(cell => {
-                cell.addEventListener('click', handleTeamCellClick);
-            });
-            
-            resetBtn.addEventListener('click', resetGame);
-            newGameBtn.addEventListener('click', () => {
-                resetGame();
-                scores = { X: 0, O: 0 };
-                updateScores();
-            });
-            
-            teamResetBtn.addEventListener('click', resetTeamGame);
-            teamNewGameBtn.addEventListener('click', () => {
-                resetTeamGame();
-                teamScores = { X: 0, O: 0 };
-                updateTeamScores();
-            });
-            
-            modeBtn.addEventListener('click', toggleAIMode);
-            playAgainBtn.addEventListener('click', resetGame);
-            soundToggle.addEventListener('click', toggleSound);
-            
-            playerXInput.addEventListener('input', (e) => {
-                playerNames.X = e.target.value || 'Player X';
-                updatePlayerTurn();
-            });
-            
-            playerOInput.addEventListener('input', (e) => {
-                playerNames.O = e.target.value || 'Player O';
-                updatePlayerTurn();
-            });
-            
-            difficultyBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    difficultyBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    difficulty = btn.getAttribute('data-difficulty');
-                });
-            });
-            
-            createTeamBtn.addEventListener('click', createTeam);
-            joinTeamBtn.addEventListener('click', joinTeam);
-            inviteBtn.addEventListener('click', generateInviteLink);
-            copyBtn.addEventListener('click', copyInviteLink);
-            
-            sendBtn.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-            
-            // Functions
-            function initGame() {
-                updatePlayerTurn();
-                updateScores();
-                updateTeamScores();
-                generateInviteLink();
-            }
-            
-            function switchTab(tabId) {
-                // Update tabs
-                tabs.forEach(tab => tab.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-                
-                document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-                
-                currentTab = tabId;
-                
-                // Reset both games when switching tabs
-                resetGame();
-                resetTeamGame();
-            }
-            
-            function handleCellClick(e) {
-                if (currentTab !== 'single') return;
-                
-                const cell = e.target;
-                const index = parseInt(cell.getAttribute('data-index'));
-                
-                // Check if cell is already taken or game is not active
-                if (gameBoard[index] !== '' || !gameActive) return;
-                
-                // Play sound
-                if (soundEnabled) playMoveSound();
-                
-                // Update game board and UI
-                gameBoard[index] = currentPlayer;
-                cell.textContent = currentPlayer;
-                cell.classList.add(currentPlayer.toLowerCase());
-                
-                // Check for win or draw
-                if (checkWin(gameBoard, cells)) {
-                    if (soundEnabled) playWinSound();
-                    endGame(false);
-                    return;
-                }
-                
-                if (checkDraw()) {
-                    if (soundEnabled) playDrawSound();
-                    endGame(true);
-                    return;
-                }
-                
-                // Switch player
-                switchPlayer();
-                
-                // AI move if enabled and it's AI's turn
-                if (aiMode && currentPlayer === 'O' && gameActive) {
-                    setTimeout(makeAIMove, 600);
-                }
-            }
-            
-            function handleTeamCellClick(e) {
-                if (currentTab !== 'team') return;
-                
-                const cell = e.target;
-                const index = parseInt(cell.getAttribute('data-index'));
-                
-                // Check if cell is already taken or game is not active
-                if (gameBoard[index] !== '' || !gameActive) return;
-                
-                // Play sound
-                if (soundEnabled) playMoveSound();
-                
-                // Update game board and UI
-                gameBoard[index] = currentPlayer;
-                cell.textContent = currentPlayer;
-                cell.classList.add(currentPlayer.toLowerCase());
-                
-                // Check for win or draw
-                if (checkWin(gameBoard, teamCells)) {
-                    if (soundEnabled) playWinSound();
-                    endTeamGame(false);
-                    return;
-                }
-                
-                if (checkDraw()) {
-                    if (soundEnabled) playDrawSound();
-                    endTeamGame(true);
-                    return;
-                }
-                
-                // Switch player
-                switchPlayer();
-                updatePlayerTurn();
-            }
-            
-            function makeAIMove() {
-                let move;
-                
-                switch (difficulty) {
-                    case 'easy':
-                        move = getRandomMove();
-                        break;
-                    case 'medium':
-                        move = getMediumMove();
-                        break;
-                    case 'hard':
-                        move = getBestMove();
-                        break;
-                    default:
-                        move = getRandomMove();
-                }
-                
-                if (move !== null) {
-                    gameBoard[move] = currentPlayer;
-                    cells[move].textContent = currentPlayer;
-                    cells[move].classList.add(currentPlayer.toLowerCase());
-                    
-                    if (soundEnabled) playMoveSound();
-                    
-                    if (checkWin(gameBoard, cells)) {
-                        if (soundEnabled) playWinSound();
-                        endGame(false);
-                        return;
-                    }
-                    
-                    if (checkDraw()) {
-                        if (soundEnabled) playDrawSound();
-                        endGame(true);
-                        return;
-                    }
-                    
-                    switchPlayer();
-                }
-            }
-            
-            function getRandomMove() {
-                const emptyCells = [];
-                gameBoard.forEach((cell, index) => {
-                    if (cell === '') emptyCells.push(index);
-                });
-                
-                if (emptyCells.length === 0) return null;
-                
-                const randomIndex = Math.floor(Math.random() * emptyCells.length);
-                return emptyCells[randomIndex];
-            }
-            
-            function getMediumMove() {
-                // Try to win if possible
-                for (const pattern of winPatterns) {
-                    const [a, b, c] = pattern;
-                    if (gameBoard[a] === 'O' && gameBoard[b] === 'O' && gameBoard[c] === '') return c;
-                    if (gameBoard[a] === 'O' && gameBoard[c] === 'O' && gameBoard[b] === '') return b;
-                    if (gameBoard[b] === 'O' && gameBoard[c] === 'O' && gameBoard[a] === '') return a;
-                }
-                
-                // Block opponent from winning
-                for (const pattern of winPatterns) {
-                    const [a, b, c] = pattern;
-                    if (gameBoard[a] === 'X' && gameBoard[b] === 'X' && gameBoard[c] === '') return c;
-                    if (gameBoard[a] === 'X' && gameBoard[c] === 'X' && gameBoard[b] === '') return b;
-                    if (gameBoard[b] === 'X' && gameBoard[c] === 'X' && gameBoard[a] === '') return a;
-                }
-                
-                // Otherwise make a random move
-                return getRandomMove();
-            }
-            
-            function getBestMove() {
-                // Minimax algorithm implementation
-                function minimax(board, depth, isMaximizing) {
-                    // Check for terminal states
-                    if (checkWinForPlayer(board, 'O')) return 10 - depth;
-                    if (checkWinForPlayer(board, 'X')) return depth - 10;
-                    if (board.every(cell => cell !== '')) return 0;
-                    
-                    if (isMaximizing) {
-                        let bestScore = -Infinity;
-                        for (let i = 0; i < 9; i++) {
-                            if (board[i] === '') {
-                                board[i] = 'O';
-                                let score = minimax(board, depth + 1, false);
-                                board[i] = '';
-                                bestScore = Math.max(score, bestScore);
-                            }
-                        }
-                        return bestScore;
-                    } else {
-                        let bestScore = Infinity;
-                        for (let i = 0; i < 9; i++) {
-                            if (board[i] === '') {
-                                board[i] = 'X';
-                                let score = minimax(board, depth + 1, true);
-                                board[i] = '';
-                                bestScore = Math.min(score, bestScore);
-                            }
-                        }
-                        return bestScore;
-                    }
-                }
-                
-                let bestMove = -1;
-                let bestScore = -Infinity;
-                
-                for (let i = 0; i < 9; i++) {
-                    if (gameBoard[i] === '') {
-                        gameBoard[i] = 'O';
-                        let score = minimax(gameBoard, 0, false);
-                        gameBoard[i] = '';
-                        
-                        if (score > bestScore) {
-                            bestScore = score;
-                            bestMove = i;
-                        }
-                    }
-                }
-                
-                return bestMove;
-            }
-            
-            function checkWinForPlayer(board, player) {
-                for (const pattern of winPatterns) {
-                    const [a, b, c] = pattern;
-                    if (board[a] === player && board[b] === player && board[c] === player) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            
-            function switchPlayer() {
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                updatePlayerTurn();
-            }
-            
-            function updatePlayerTurn() {
-                if (currentTab === 'single') {
-                    const playerName = currentPlayer === 'X' ? playerNames.X : playerNames.O;
-                    playerTurnElement.innerHTML = `<i class="${currentPlayer === 'X' ? 'fas fa-times' : 'far fa-circle'} player-icon"></i> ${playerName}'s Turn`;
-                    playerTurnElement.className = 'player-turn ' + currentPlayer.toLowerCase();
-                } else {
-                    playerTurnElement.innerHTML = `<i class="${currentPlayer === 'X' ? 'fas fa-times' : 'far fa-circle'} player-icon"></i> Team ${currentPlayer}'s Turn`;
-                    playerTurnElement.className = 'player-turn ' + currentPlayer.toLowerCase();
-                }
-            }
-            
-            function checkWin(board, cellElements) {
-                for (const pattern of winPatterns) {
-                    const [a, b, c] = pattern;
-                    
-                    if (board[a] && 
-                        board[a] === board[b] && 
-                        board[a] === board[c]) {
-                        
-                        // Highlight winning cells
-                        pattern.forEach(index => {
-                            cellElements[index].classList.add('winning-cell');
-                        });
-                        
-                        return true;
-                    }
-                }
-                return false;
-            }
-            
-            function checkDraw() {
-                return gameBoard.every(cell => cell !== '');
-            }
-            
-            function endGame(isDraw) {
-                gameActive = false;
-                
-                if (isDraw) {
-                    resultTextElement.textContent = "It's a Draw!";
-                } else {
-                    const winnerName = currentPlayer === 'X' ? playerNames.X : playerNames.O;
-                    resultTextElement.textContent = `${winnerName} Wins!`;
-                    scores[currentPlayer]++;
-                    updateScores();
-                }
-                
-                messageElement.classList.add('show');
-            }
-            
-            function endTeamGame(isDraw) {
-                gameActive = false;
-                
-                if (isDraw) {
-                    resultTextElement.textContent = "It's a Draw!";
-                } else {
-                    resultTextElement.textContent = `Team ${currentPlayer} Wins!`;
-                    teamScores[currentPlayer]++;
-                    updateTeamScores();
-                }
-                
-                messageElement.classList.add('show');
-            }
-            
-            function updateScores() {
-                scoreXElement.textContent = scores['X'];
-                scoreOElement.textContent = scores['O'];
-            }
-            
-            function updateTeamScores() {
-                teamScoreXElement.textContent = teamScores['X'];
-                teamScoreOElement.textContent = teamScores['O'];
-            }
-            
-            function resetGame() {
-                // Reset game state
-                gameBoard = ['', '', '', '', '', '', '', '', ''];
+            if (isOnlineMode && teamInfo.style.display === 'block' && teamMembers >= 2) {
                 gameActive = true;
-                currentPlayer = 'X';
-                
-                // Reset UI
-                cells.forEach(cell => {
-                    cell.textContent = '';
-                    cell.classList.remove('x', 'o', 'winning-cell');
-                });
-                
-                // Reset message
-                messageElement.classList.remove('show');
-                
-                updatePlayerTurn();
-            }
-            
-            function resetTeamGame() {
-                // Reset game state
-                gameBoard = ['', '', '', '', '', '', '', '', ''];
+                currentPlayer = isTeamLeader ? 'X' : 'O';
+                statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+            } else if (!isOnlineMode) {
                 gameActive = true;
-                currentPlayer = 'X';
-                
-                // Reset UI
-                teamCells.forEach(cell => {
-                    cell.textContent = '';
-                    cell.classList.remove('x', 'o', 'winning-cell');
-                });
-                
-                // Reset message
-                messageElement.classList.remove('show');
-                
-                updatePlayerTurn();
+            } else {
+                gameActive = false;
             }
-            
-            function toggleAIMode() {
-                aiMode = !aiMode;
-                modeBtn.innerHTML = `<i class="fas fa-robot"></i> AI Mode: ${aiMode ? 'On' : 'Off'}`;
-                modeBtn.style.background = aiMode ? 
-                    'linear-gradient(45deg, #6a11cb, #2575fc)' : 
-                    'linear-gradient(45deg, #FFA62E, #EA4C89)';
-                
-                // Reset game when changing mode
-                resetGame();
-            }
-            
-            function toggleSound() {
-                soundEnabled = !soundEnabled;
-                const icon = soundToggle.querySelector('i');
-                icon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
-                
-                if (soundEnabled) playMoveSound();
-            }
-            
-            function createTeam() {
-                alert('Team created! Share the invite link with your friends to join your team.');
-            }
-            
-            function joinTeam() {
-                const team = prompt('Which team would you like to join? (Enter X or O)');
-                if (team && (team.toUpperCase() === 'X' || team.toUpperCase() === 'O')) {
-                    alert(`You have joined Team ${team.toUpperCase()}!`);
-                } else {
-                    alert('Invalid team selection. Please enter X or O.');
-                }
-            }
-            
-            function generateInviteLink() {
-                const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-                inviteLink.textContent = `https://tictactoe.com/join?team=X&room=${roomId}`;
-            }
-            
-            function copyInviteLink() {
-                navigator.clipboard.writeText(inviteLink.textContent).then(() => {
-                    alert('Invite link copied to clipboard!');
-                });
-            }
-            
-            function sendMessage() {
-                const message = chatInput.value.trim();
-                if (message) {
-                    const messageElement = document.createElement('div');
-                    messageElement.classList.add('chat-message', 'me');
-                    messageElement.textContent = `You: ${message}`;
-                    chatMessages.appendChild(messageElement);
-                    chatInput.value = '';
-                    
-                    // Auto scroll to bottom
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                    
-                    // Simulate a reply after a delay
-                    setTimeout(() => {
-                        const replies = [
-                            "Nice move!",
-                            "Let's focus on the center",
-                            "I think we should block their diagonal",
-                            "Good strategy!",
-                            "Watch out for their next move"
-                        ];
-                        const randomReply = replies[Math.floor(Math.random() * replies.length)];
-                        
-                        const replyElement = document.createElement('div');
-                        replyElement.classList.add('chat-message');
-                        replyElement.textContent = `Player X2: ${randomReply}`;
-                        chatMessages.appendChild(replyElement);
-                        
-                        // Auto scroll to bottom
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }, 1000);
-                }
-            }
-            
-            // Sound functions
-            function playMoveSound() {
-                const context = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = context.createOscillator();
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(currentPlayer === 'X' ? 440 : 523.25, context.currentTime);
-                
-                const gainNode = context.createGain();
-                gainNode.gain.setValueAtTime(0.3, context.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.2);
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(context.destination);
-                
-                oscillator.start();
-                oscillator.stop(context.currentTime + 0.2);
-            }
-            
-            function playWinSound() {
-                const context = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = context.createOscillator();
-                oscillator.type = 'sine';
-                
-                const gainNode = context.createGain();
-                gainNode.gain.setValueAtTime(0.3, context.currentTime);
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(context.destination);
-                
-                // Play a victory melody
-                oscillator.frequency.setValueAtTime(659.25, context.currentTime); // E5
-                oscillator.start();
-                
-                setTimeout(() => {
-                    oscillator.frequency.setValueAtTime(783.99, context.currentTime); // G5
-                }, 200);
-                
-                setTimeout(() => {
-                    oscillator.frequency.setValueAtTime(1046.50, context.currentTime); // C6
-                }, 400);
-                
-                oscillator.stop(context.currentTime + 0.8);
-            }
-            
-            function playDrawSound() {
-                const context = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = context.createOscillator();
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(220, context.currentTime);
-                
-                const gainNode = context.createGain();
-                gainNode.gain.setValueAtTime(0.3, context.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 1);
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(context.destination);
-                
-                oscillator.start();
-                oscillator.stop(context.currentTime + 1);
-            }
-        });
+        }
     </script>
 </body>
 </html>
